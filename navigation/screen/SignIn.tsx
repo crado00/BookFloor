@@ -18,6 +18,7 @@ import {
 
 import { useNavigation  } from '@react-navigation/native';
 
+
 function SignIn(): React.JSX.Element {
     const isDarkMode = useColorScheme() === 'dark';
   
@@ -39,7 +40,7 @@ function SignIn(): React.JSX.Element {
     };
     const signUp = () => {
         /* TypeScript에 속성이 없음*/
-        navigation.navigate('SignUp');
+        navigation.navigate('SignUp');//오류가 뜨지만 작동이 되는 상태
     };
     
     const signIn =() => {//마이페이지 확인용으로 잠깐만 사용
