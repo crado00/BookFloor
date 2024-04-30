@@ -5,13 +5,6 @@ import { CommonType } from './types';
 import SignIn from './screen/SignIn';
 import SignUp from './screen/SignUp';
 import MyPage from './screen/MyPage';
-import { useNavigation  } from '@react-navigation/native';
-
-
-
-    
-    
-    const Stack = createStackNavigator<CommonType.RootStackPageList>();
 
     // 스택 네비게이션의 사용자 정의 옵션 정의
     const customStackNavigationOptions: StackNavigationOptions = {
