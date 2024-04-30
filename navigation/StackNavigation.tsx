@@ -5,12 +5,6 @@ import { CommonType } from './types';
 import SignIn from './screen/SignIn';
 import SignUp from './screen/SignUp';
 import MyPage from './screen/MyPage';
-import { useNavigation  } from '@react-navigation/native';
-
-<<<<<<< HEAD
-
-=======
->>>>>>> f222391382705b39297792fe2479010b67e7798a
 
 const StackNavigation = () => {// 스택 내비게이션을 설정하는 컴포넌트
     
