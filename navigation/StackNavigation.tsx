@@ -6,6 +6,11 @@ import SignIn from './screen/SignIn';
 import SignUp from './screen/SignUp';
 import MyPage from './screen/MyPage';
 
+const StackNavigation = () => {// 스택 내비게이션을 설정하는 컴포넌트
+    
+    
+    const Stack = createStackNavigator<CommonType.RootStackPageList>();
+
     // 스택 네비게이션의 사용자 정의 옵션 정의
     const customStackNavigationOptions: StackNavigationOptions = {
         gestureEnabled: false,
@@ -34,3 +39,4 @@ import MyPage from './screen/MyPage';
 
 
 export default StackNavigation;
+
