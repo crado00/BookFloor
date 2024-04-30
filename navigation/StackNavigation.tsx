@@ -8,7 +8,7 @@ import MyPage from './screen/MyPage';
 import { useNavigation  } from '@react-navigation/native';
 
 
-const StackNavigation = () => {// 스택 내비게이션을 설정하는 컴포넌트
+
     
     
     const Stack = createStackNavigator<CommonType.RootStackPageList>();
