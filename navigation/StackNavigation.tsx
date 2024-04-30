@@ -39,3 +39,4 @@ const StackNavigation = () => {// 스택 내비게이션을 설정하는 컴포�
 
 
 export default StackNavigation;
+
