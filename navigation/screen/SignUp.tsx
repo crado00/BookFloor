@@ -70,7 +70,9 @@ const SignUp = ({}) => {
     const [email, setEmail] = useState<string>('');
     //const [birthDate, setbirthDate] = useState<Date>(); 생년월일 변경준비
     const [birthDate, setbirthDate] = useState<string>('19990430');
-    
+    const [loading, setLoading] = useState(false);
+
+
     const idChange = (input: string) => {
         setduplicate(false);
         setId(input);
@@ -94,6 +96,17 @@ const SignUp = ({}) => {
 
 
     const duplicateButton = () => {
+
+        var idchack = 'id=' + id;
+
+        fetch('http://localhost:3001/api/user/register', {//회원가입 부분 url 조정 필요
+        method: 'POST',
+        body: idchack,
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+        },
+      })
+        }
         if(true){
             setduplicate(true);// 중복확인을 위한 코드
             ToastAndroid.show('사용가능한 아이디입니다.', ToastAndroid.SHORT);
@@ -109,11 +122,43 @@ const SignUp = ({}) => {
                         if(name !== ''){
                             if(email !== ''){
                                 if (birthDate !== null){
-                                    //서버로 사용자 정보 전달
+                                    //서버로 사용자 정보 전달  
+                                    var dataToSend ={
+                                        ID: id,
+                                        password: pw,
+                                        name: name,
+                                        email: email,
+                                        birthDate: birthDate
+                                        
+                                    }
 
-                                
 
-                                    navigation.goBack();
+                                    var formBody = [];
+                                    for (var key in dataToSend) {
+                                        var encodedKey = encodeURIComponent(key);
+                                        var encodedValue = encodeURIComponent(dataToSend[key as keyof typeof dataToSend]);
+                                        formBody.push(encodedKey + '=' + encodedValue);
+                                    }
+                                    var formData = formBody.join('&');
+
+                                    fetch('http://localhost:3001/api/user/register', {//회원가입 부분 url 조정 필요
+                                        method: 'POST',
+                                        body: formData,
+                                        headers: {
+                                          'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+                                        },
+                                      })
+                                        .then((response) => response.json())
+                                        .then((responseJson) => {
+                                            console.log(responseJson);
+                                            if (responseJson.status === 'success') {
+                                                console.log('Registration Successful. Please Login to proceed');
+                                              }
+                                        })
+                                        .catch((error) => {
+                                            console.error(error);
+                                        });
+
                                 }else{
                                     ToastAndroid.show('사용자 정보를 입력해주세요.', ToastAndroid.SHORT);
                                 }

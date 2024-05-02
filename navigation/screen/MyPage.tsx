@@ -31,19 +31,23 @@ const MyPage = () =>{
         </View>
         
       </View>
-      <View style = {{justifyContent: 'space-evenly', flexDirection: 'row'}}>
-        <View style = {{justifyContent: 'center'}}>
-          <Text style = {{textAlign: 'center'}}>게시글/댓글</Text>
-          <Text style = {{textAlign: 'center'}}>수넣을자리</Text>
+      <View style = {styles.viewGrup}>
+      <View style={[styles.divider]} />
+        <View style = {styles.textView}>
+          <Text style = {styles.text}>게시글/댓글</Text>
+          <Text style = {styles.text}>수넣을자리</Text>
         </View>
-        <View>
-          <Text style = {{textAlign: 'center'}}>받은 공감</Text>
-          <Text style = {{textAlign: 'center'}}>수넣을자리</Text>
+        <View style={[styles.divider]} />
+        <View style = {styles.textView}>
+          <Text style = {styles.text}>받은 공감</Text>
+          <Text style = {styles.text}>수넣을자리</Text>
         </View>
-        <View>
-          <Text>내 서재</Text>
-          <Text>수넣을자리</Text>
+        <View style={[styles.divider]} />
+        <View style = {styles.textView}>
+          <Text style = {styles.text}>내 서재</Text>
+          <Text style = {styles.text}>수넣을자리</Text>
         </View>
+        <View style={[styles.divider]} />
       </View>
       <View style = {{height: 10 ,backgroundColor: 'white_gray'}}/>
       <TabViewExample/>
@@ -94,6 +98,28 @@ const styles = StyleSheet.create({
       justifyContent: 'flex-start',
       alignItems: 'center',
     },
+    textView: {
+      flex: 1,
+      justifyContent: 'center'
+    },
+    text:{
+      textAlign: 'center'
+    },
+    element: {
+      flex: 1, // 동일한 너비를 가지도록 설정
+      paddingVertical: 10,
+      paddingHorizontal: 20,
+    },
+    divider: {
+      borderLeftWidth: 1,
+      borderLeftColor: 'black'
+    },
+    viewGrup: {
+      justifyContent: 'space-evenly',
+      flexDirection: 'row',
+      marginLeft: 20,
+      marginRight: 20
+    }
     
   });
 

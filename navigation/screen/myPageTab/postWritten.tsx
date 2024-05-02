@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { View } from 'react-native';
+import { View, Image } from 'react-native';
+
+
+
+
+
+
+
 
 
 export default function postWritten (){
