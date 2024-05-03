@@ -18,6 +18,7 @@ import {
 
 import { useNavigation  } from '@react-navigation/native';
 
+import { storeUserData, retrieveUserData } from './rogin/auth'
 
 function SignIn(): React.JSX.Element {
     const isDarkMode = useColorScheme() === 'dark';
@@ -44,7 +45,24 @@ function SignIn(): React.JSX.Element {
     };
     
     const signIn =() => {//마이페이지 확인용으로 잠깐만 사용
-      navigation.navigate('MyPage');
+      const response = fetch('http://example.com/api/login', {// 변경 필요
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id, pw })
+      }).then((response) => response.json())
+      .then((responseJson) => {
+          console.log(responseJson);
+          if (responseJson.status === 'success') {// 변경 필요 토큰을 가져와야함
+              storeUserData(responseJson.token, id);
+              navigation.navigate('MyPage');
+            }
+      })
+      .catch((error) => {
+          console.error(error);
+      });
+      //navigation.navigate('MyPage');
     }
     const kakaoSignIn = () => {
       
@@ -108,10 +126,10 @@ function SignIn(): React.JSX.Element {
         <Text style={styles.titles}>책마루</Text>
         <View style={styles.row}>
           <View style={styles.textViews}>
-            <Text style={styles.texts}>아이디</Text>
+            <Text style={styles.texts}>이메일</Text>
           </View>
           <View style={styles.textInputsContainer}>
-            <TextInput placeholder="아이디를 입력하세요." onChangeText={idChange} style={styles.idInputs} value={id} ></TextInput>
+            <TextInput placeholder="이메일을 입력하세요." onChangeText={idChange} style={styles.idInputs} value={id} ></TextInput>
           </View>
         </View>
   

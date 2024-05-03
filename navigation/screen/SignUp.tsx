@@ -96,24 +96,32 @@ const SignUp = ({}) => {
 
 
     const duplicateButton = () => {
-
+        
         var idchack = 'id=' + id;
 
-        fetch('http://localhost:3001/api/user/register', {//회원가입 부분 url 조정 필요
+        fetch('http://localhost:3001/api/user/register', {//아이디 중복 확인 부분 url 조정 필요
         method: 'POST',
         body: idchack,
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
         },
       })
-        }
-        if(true){
-            setduplicate(true);// 중복확인을 위한 코드
-            ToastAndroid.show('사용가능한 아이디입니다.', ToastAndroid.SHORT);
-        } else{
+        .then((response) => response.json())
+        .then((responseJson) => {
+            console.log(responseJson);
+            if (responseJson.status === 'success') {
+                setduplicate(true);// 중복확인을 위한 코드
+                console.log('Registration Successful. Please Login to proceed');
+              }
+        })
+        .catch((error) => {
             ToastAndroid.show('중복된 아이디입니다.', ToastAndroid.SHORT);
-        }
+            console.error(error);
+        });
+
     }
+
+
     const signUpButton = () => {
         if (id !== '' ){
             if (duplicate === true){
