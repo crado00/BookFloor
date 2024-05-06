@@ -11,6 +11,7 @@ const storeUserData = async (token: string, userId: string) => {
 const retrieveUserData = async () => {
   try {
     const userData = await AsyncStorage.getItem('userData');
+    console.log(userData);
     return userData ? JSON.parse(userData) : null;
   } catch (error) {
     console.error('Failed to retrieve user data:', error);

@@ -4,5 +4,7 @@ export declare module CommonType {
         SignIn: undefined;
         SignUp: undefined;
         MyPage: undefined;
+        profileChange: undefined;
+        mainPage: undefined;
     };
 }

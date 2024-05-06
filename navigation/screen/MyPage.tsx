@@ -1,11 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect } from 'react';
 import { View, StyleSheet, Button, Text , Image, TouchableOpacity} from 'react-native';
 import TabViewExample from './myPageTab/tabNavigation';
+import { useNavigation  } from '@react-navigation/native';
+import { retrieveUserData } from './rogin/auth'
 
 const MyPage = () =>{
 
   const [Name, setName] = useState<string>('유저이름');
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await retrieveUserData();
+      setName(data.userId);
+    };
+
+    fetchData();
+  }, []);
+
+  const navigation = useNavigation();
+
+  const pfcp = () =>{
+    navigation.navigate('profileChange')
+  }
 
     return(
     <View style = {styles.container}>
@@ -22,7 +38,7 @@ const MyPage = () =>{
           </View>
           <View style = {styles.profile3}>
             <View >
-              <Button title='프로필 변경'/>
+              <Button title='프로필 변경'onPress={pfcp}/>
             </View>
             <View>
               <Button title='위치 변경'/>
@@ -79,7 +95,8 @@ const styles = StyleSheet.create({
       overflow: 'hidden', // 이미지가 원 밖으로 벗어나지 않도록 설정합니다.
       borderWidth: 2,
       borderColor: 'black',
-    }, userName: {
+    },
+    userName: {
       textAlign: 'left',
       fontSize: 20,
     },

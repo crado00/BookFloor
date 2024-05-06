@@ -45,7 +45,7 @@ function SignIn(): React.JSX.Element {
     };
     
     const signIn =() => {//마이페이지 확인용으로 잠깐만 사용
-      const response = fetch('http://example.com/api/login', {// 변경 필요
+      /*const response = fetch('http://example.com/api/login', {// 변경 필요
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -61,8 +61,8 @@ function SignIn(): React.JSX.Element {
       })
       .catch((error) => {
           console.error(error);
-      });
-      //navigation.navigate('MyPage');
+      });*/
+      navigation.navigate('mainPage');
     }
     const kakaoSignIn = () => {
       

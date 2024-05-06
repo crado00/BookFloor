@@ -5,6 +5,8 @@ import { CommonType } from './types';
 import SignIn from './screen/SignIn';
 import SignUp from './screen/SignUp';
 import MyPage from './screen/MyPage';
+import profileChange from './screen/profileChange';
+import mainPage from './screen/mainPage';
 
 const StackNavigation = () => {// 스택 내비게이션을 설정하는 컴포넌트
     
@@ -32,6 +34,8 @@ const StackNavigation = () => {// 스택 내비게이션을 설정하는 컴포�
                 <Stack.Screen name='SignUp'component={SignUp} options={{ headerShown: false }}>
                 </Stack.Screen>
                 <Stack.Screen name='MyPage' component = {MyPage} options = {{headerShown: false }}/>
+                <Stack.Screen name='profileChange' component = {profileChange}/>
+                <Stack.Screen name='mainPage' component = {mainPage} options = {{headerShown: false }}/>
             </Stack.Navigator>
         </NavigationContainer >
     )
