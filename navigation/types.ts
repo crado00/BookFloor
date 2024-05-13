@@ -3,8 +3,10 @@ export declare module CommonType {
         default: undefined;
         SignIn: undefined;
         SignUp: undefined;
-        MyPage: undefined;
         profileChange: undefined;
-        mainPage: undefined;
+        ocrPage: undefined;
+        pageGruep: undefined;
+        searchPage: undefined;
+        bookDetailsPage: undefined;
     };
 }

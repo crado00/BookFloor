@@ -1,9 +1,9 @@
 import React, { useState , useEffect } from 'react';
 import { View, StyleSheet, Button, Text , Image, TouchableOpacity, FlatList} from 'react-native';
 import { ScrollView, TextInput } from 'react-native-gesture-handler';
-import { SearchBar } from 'react-native-screens';
 import { storeUserData, retrieveUserData } from './rogin/auth'
-
+import { useNavigation  } from '@react-navigation/native';
+import axios from 'axios';
 
 
 const userData = retrieveUserData();
@@ -21,19 +21,17 @@ interface bookSuggestion{
 }
     
 
-
-
-
-
-
-
 export default function(){
+    const [searchWord, setSearchWord] = useState<string>('');
+
+    const navigation = useNavigation();
+
 
     var list = '';
     var bookRank;
     var bookSuggestion;
 
-
+    
     bookSuggestion = [
         {
             bookId: 'b1',
@@ -50,6 +48,9 @@ export default function(){
         }
     ]
 
+    const searchWordChange = (input: string) => {
+        setSearchWord(input);
+    }
 /*
     useEffect(() => {
         fetch('내용 필요', {
@@ -72,6 +73,17 @@ export default function(){
         });
     }, []);
 */
+    const typing = () =>{
+
+        navigation.navigate('searchPage', {search: searchWord});
+    }
+
+    const ocrbtn = async () =>{
+        
+        navigation.navigate('ocrPage');
+        
+    }
+
 
     const renderItem = ({item}: {item: bookRank}) => (
         <TouchableOpacity>
@@ -118,10 +130,10 @@ export default function(){
         </View>
         <View style = {styles.searchVar}>
             <View style = {{flex: 1, borderWidth: 2,borderColor: 'black', margin: 5}}>
-                <TextInput placeholder = '책 이름 검색'/>
+                <TextInput placeholder = '책 이름 검색' onChangeText = {searchWordChange} value={searchWord}/>
             </View>
-            <Button title='검색'/>
-            <Button title='ocr'/>
+            <Button title='검색' onPress={typing}/>
+            <Button title='ocr' onPress={ocrbtn}/>
         </View>
         <Text style = {{marginTop: 30}}>이 주의 추천 도서 </Text>
         <View style = {styles.ScrollView}>

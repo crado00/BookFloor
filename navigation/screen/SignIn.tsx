@@ -62,7 +62,7 @@ function SignIn(): React.JSX.Element {
       .catch((error) => {
           console.error(error);
       });*/
-      navigation.navigate('mainPage');
+      navigation.navigate('pageGruep');
     }
     const kakaoSignIn = () => {
       
