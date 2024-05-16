@@ -62,7 +62,11 @@ function SignIn(): React.JSX.Element {
       .catch((error) => {
           console.error(error);
       });*/
-      navigation.navigate('pageGruep');
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'pageGruep' }],//작동됨 뒤로가기를 입력 시 프로그램 종료
+      });
+      //navigation.navigate('pageGruep');
     }
     const kakaoSignIn = () => {
       

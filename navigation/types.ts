@@ -8,5 +8,6 @@ export declare module CommonType {
         pageGruep: undefined;
         searchPage: undefined;
         bookDetailsPage: undefined;
+        profileMake: undefined;
     };
 }

@@ -78,15 +78,17 @@ export default function(){
         navigation.navigate('searchPage', {search: searchWord});
     }
 
-    const ocrbtn = async () =>{
+    const ocrbtn = () =>{
         
         navigation.navigate('ocrPage');
         
     }
-
+    const bookBtn = (id : string) => {
+        navigation.navigate('bookDetailsPage', {id: id});
+    }
 
     const renderItem = ({item}: {item: bookRank}) => (
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => bookBtn(item.bookId)}>
           <View style = {styles.book}>
                 <View style = {{flex: 1}}>
                     <Image source={{uri: item.img}} style = {{width: '100%', height: '100%'}}/>

@@ -123,6 +123,69 @@ const SignUp = ({}) => {
 
 
     const signUpButton = () => {
+        switch(true){
+            case id !== '':
+                ToastAndroid.show('사용자정보를 입력해주세요.', ToastAndroid.SHORT);
+                break;
+            case duplicate === true:
+                ToastAndroid.show('중복확인이 필요합니다.', ToastAndroid.SHORT);
+                break;
+            case pw !== '':
+            ToastAndroid.show('비밀번호가 일치하지 않습니다.', ToastAndroid.SHORT);
+            break;
+            case pw === pwChack:
+            ToastAndroid.show('비밀번호가 일치하지 않습니다.', ToastAndroid.SHORT);
+            break;
+            case name !== '':
+            ToastAndroid.show('비밀번호가 일치하지 않습니다.', ToastAndroid.SHORT);
+            break;
+            case email !== '':
+            ToastAndroid.show('비밀번호가 일치하지 않습니다.', ToastAndroid.SHORT);
+            break;
+            case email !== '':
+            ToastAndroid.show('비밀번호가 일치하지 않습니다.', ToastAndroid.SHORT);
+            break;
+            case birthDate !== null:
+                //서버로 사용자 정보 전달  
+                var dataToSend ={
+                    ID: id,
+                    password: pw,
+                    name: name,
+                    email: email,
+                    birthDate: birthDate
+                    
+                }
+
+
+                var formBody = [];
+                for (var key in dataToSend) {
+                    var encodedKey = encodeURIComponent(key);
+                    var encodedValue = encodeURIComponent(dataToSend[key as keyof typeof dataToSend]);
+                    formBody.push(encodedKey + '=' + encodedValue);
+                }
+                var formData = formBody.join('&');
+
+                fetch('http://localhost:3001/api/user/register', {//회원가입 부분 url 조정 필요
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+                    },
+                  })
+                    .then((response) => response.json())
+                    .then((responseJson) => {
+                        console.log(responseJson);
+                        if (responseJson.status === 'success') {
+                            console.log('Registration Successful. Please Login to proceed');
+                            navigation.navigate('profileMake');
+                          }
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                    });
+
+        }
+/*
         if (id !== '' ){
             if (duplicate === true){
                 if (pw !==''){
@@ -161,6 +224,7 @@ const SignUp = ({}) => {
                                             console.log(responseJson);
                                             if (responseJson.status === 'success') {
                                                 console.log('Registration Successful. Please Login to proceed');
+                                                navigation.navigate('profileMake');
                                               }
                                         })
                                         .catch((error) => {
@@ -188,6 +252,7 @@ const SignUp = ({}) => {
         }else{
             ToastAndroid.show('사용자 정보를 입력해주세요.', ToastAndroid.SHORT);
         }
+        */
         
     }
     const cancelSubscriptionButton = () => {
