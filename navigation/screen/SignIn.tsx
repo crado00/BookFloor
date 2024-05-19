@@ -69,7 +69,7 @@ function SignIn(): React.JSX.Element {
       //navigation.navigate('pageGruep');
     }
     const kakaoSignIn = () => {
-      
+      navigation.navigate('profileMake');
     };
   
     const styles = StyleSheet.create({

@@ -1,12 +1,11 @@
 import React, {useState, useEffect} from "react";
-import { View, StyleSheet, Button, Text , Image, TouchableOpacity, FlatList} from 'react-native';
+import { View, StyleSheet, Button, Text , Image, TouchableOpacity, FlatList, Keyboard} from 'react-native';
 import { ScrollView, TextInput } from 'react-native-gesture-handler';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import axios from 'axios';
-import { Route } from "react-native-tab-view";
+import { searchCode } from "./search/searchCode"
 
 interface data{
-    bookID: string;
+    bookId: string;
     img: string;
     title: string;
     writer: string;
@@ -23,9 +22,9 @@ export default function(){//도서 검색 키워드를 메인페이지에서 가
 
     const [keyword, setKeyword] = useState<string>('');
     var list;
-    var data;
+    const [data, setData] = useState<data[]>([]);
     //const [fetData, setFetData] = useState([])
-
+/*
     data = [{
         bookID: '9791161571379',
         img: 'https://image.aladin.co.kr/product/29858/98/cover/k432838027_1.jpg',
@@ -33,10 +32,29 @@ export default function(){//도서 검색 키워드를 메인페이지에서 가
         writer: '지은이: 김호연',
         publisher: '나무옆의자'
     }]
+    */
 
     useEffect(() => {
-        setKeyword(route.params?.search);//이것들도 작동 됨
+        if (route.params?.search) {
+            setKeyword(route.params.search);
+            fetchData(route.params.search);
+        }
+
     }, [route.params?.search]);
+    const search = () =>{
+        fetchData(keyword)
+        
+    }
+    const fetchData = async (keyword: string) => {
+        const booksArray = await searchCode(keyword);
+        setData(booksArray);
+        console.log(`확인용 ${data[0].bookId}`);
+    }
+
+    const setKeywordChange = (input: string) => {
+        setKeyword(input);
+    }
+
 /*
     useEffect(() => {
         const apiUrl = `http://data4library.kr/api/srchBooks?authKey=${authKey}&keyword=${keyword}&pageNo=1&pageSize=10&format=json`;
@@ -69,11 +87,12 @@ export default function(){//도서 검색 키워드를 메인페이지에서 가
     }, [keyword]);
 */
 const BookDetails = (id: string) =>{
+    console.log(`전달될 정보 : ${id}`)
     navigation.navigate('bookDetailsPage', {id: id})//문제없음
 }
     const renderItem = ({item}: {item: data}) =>(
         
-        <TouchableOpacity onPress={() => BookDetails(item.bookID)}>
+        <TouchableOpacity onPress={() => BookDetails(item.bookId)}>
             <View style = {styles.scrollitem}>
                 <View style = {styles.imgView}>
                     <Image source = {{uri: item.img}} style = {{width: '100%', height: '100%'}}/>
@@ -122,9 +141,9 @@ const BookDetails = (id: string) =>{
         <View style = {{flex: 1, backgroundColor: 'white'}}>
             <View style = {{backgroundColor: 'gray', flexDirection: 'row', justifyContent: 'flex-start'}}>
                 <View style = {{backgroundColor: 'white', margin: 5, flex: 1}}>
-                    <TextInput placeholder="도서 검색" value={keyword}/>
+                    <TextInput placeholder="도서 검색" value={keyword} onChangeText={setKeywordChange}/>
                 </View>
-                <Button title="검색"/>
+                <Button title="검색" onPress={search}/>
             </View>
             <FlatList
                 data={data}
@@ -135,6 +154,3 @@ const BookDetails = (id: string) =>{
     );
 }
 
-const search = () =>{
-    
-}

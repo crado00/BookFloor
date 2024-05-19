@@ -1,19 +1,58 @@
-import React, { useState , useEffect } from 'react';
-import { View, StyleSheet, Button, Text , Image, TouchableOpacity, FlatList, Dimensions} from 'react-native';
-import { ScrollView, TextInput } from 'react-native-gesture-handler';
-import { storeUserData, retrieveUserData } from './rogin/auth'
-import { useNavigation  } from '@react-navigation/native';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, Button, Text, Image, TouchableOpacity, ScrollView, ActivityIndicator, Dimensions, FlatList } from 'react-native';
+import { useRoute } from '@react-navigation/native';
+import axios from 'axios';
 
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
 
-
-
-export default function(){
+export default function() {
+    const route = useRoute();
+    const [bookid, setBookid] = useState('');
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(true); // 로딩 상태 추가
     const [showView, setShowView] = useState(false);
+    const [showLibrarys, setShowLibrarys] = useState(false);
+    useEffect(() => {
+        if (route.params?.id) {
+            setBookid(route.params.id);
+            setDetails(route.params.id);
+        }
+    }, [route.params?.id]);
+
+    const setDetails = async (id) => {
+        const authKey = '3893e049e54f909aaaf758d6feda80d62f0619816c3d4ab05a76826ae6dbb046';
+        const url = `http://data4library.kr/api/srchDtlList?authKey=${authKey}&isbn13=${id}&loaninfoYN=Y&format=json`;
+
+        try {
+            const response = await axios.get(url);
+            const obj = response.data;
+            if (obj.response && obj.response.detail) {
+                const newData = obj.response.detail.map((item) => {
+                    const details = item.book;
+                    return {
+                        title: details.bookname,
+                        writer: details.authors,
+                        publisher: details.publisher,
+                        class: details.class_nm,
+                        description: details.description,
+                        img: details.bookImageURL
+                    };
+                });
+                setData(newData);
+            }
+        } catch (error) {
+            console.error(`Error: ${error}`);
+        } finally {
+            setLoading(false); // 로딩 완료
+        }
+    };
 
     const toggle = () => {
         setShowView(!showView);
+    };
+    const librarys = () => {
+        setShowLibrarys(!showLibrarys);
     };
 
     const styles = StyleSheet.create({
@@ -41,7 +80,7 @@ export default function(){
             marginLeft: 20,
             marginRight: 20,
             marginTop: 5,
-            flex: 1
+            flex: 1,
         },
         btnStatus: {
             flexDirection: 'row',
@@ -54,85 +93,119 @@ export default function(){
         divider: {
             borderLeftWidth: 1,
             borderLeftColor: 'black',
-            height: 20
-          },
-    })
-    const data = [{
-        bookID: '9791161571379',
-        img: 'https://image.aladin.co.kr/product/29858/98/cover/k432838027_1.jpg',
-        title: '불편한 편의점 :김호연 장편소설',
-        writer: '지은이: 김호연',
-        publisher: '나무옆의자'
-    }]
-    return(
-        <View style = {{flex: 1, backgroundColor: 'white'}}>
-            <View style = {styles.img}>
-                <Image style = {{width: '100%', height: '100%'}} source={{uri: data[0].img}} resizeMode="contain"/>
+            height: 20,
+        },
+    });
+
+    if (loading) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <ActivityIndicator size="large" color="#0000ff" />
+            </View>
+        );
+    }
+
+    const library = [
+        {
+            libCode: '1',
+            libName: '도서관',
+            tel: '010-2345-6789',
+            closed: '휴관일',
+            operatingTime: '운영시간',
+            address: '주소'
+        }
+    ]
+
+    const renderItem = ({item}: {item: bookId}) => (
+        <TouchableOpacity >
+            <View>
+                <Text>{item.libName}</Text>
+                <Text>{item.closed} {item.operatingTime}</Text>
+                <Text>{item.address}</Text>
+            </View>
+        </TouchableOpacity>
+    )
+    return (
+        <View style={{ flex: 1, backgroundColor: 'white' }}>
+            <View style={styles.img}>
+                <Image
+                    style={{ width: '100%', height: '100%' }}
+                    source={{ uri: data[0]?.img || 'http://image.aladin.co.kr/product/7119/68/cover/8962476541_1.jpg' }}
+                    resizeMode="contain"
+                />
             </View>
             {showView ? ( // 키워드 버튼 클릭 시 이 뷰로 변경
                 <View>
-                    <Button title='뒤로가기' onPress={toggle}/>
+                    <Button title='뒤로가기' onPress={toggle} />
                 </View>
-            ) : ( <>
-            <View style = {styles.titleView}>
-                <Text style = {{fontSize: 20}}>
-                    {data[0].title}
-                </Text>
-            </View>
-            <View style = {styles.textView}>
-                <Text style = {{fontSize: 15}}>
-                    {data[0].writer}
-                </Text>
-            </View>
-            <View style = {styles.textView}>
-                <Text style = {{fontSize: 15}}>
-                    {data[0].publisher}
-                </Text>
-            </View>
-            <View style = {styles.classificationView}>
-                <Text>
-                    [문학 {'>'} 한국문학 {'>'} 소설]
-                </Text>
-            </View>
-            <View style = {styles.bookIntroduction}>
-                <ScrollView>
-                    <Text>
-                        70만 독자를 사로잡은 재미와 감동『불편한 편의점』이 다시 열렸다!한층 진득해진 이야기와 궁금증 가득한 캐릭터고난의 시간을 통과하는 사람들이 다시 편의점에 모여든다!재방문을 환영합니다. 여기는 청파동 ALWAYS편의점입니다.독고가 떠나고 1년 반이 지난 여름, 청파동 ALWAYS편의점에 새 야간 알바가...
-                    </Text>
-                </ScrollView>
-            </View>
-            <View style = {{alignItems: 'center', marginTop: 5}}>
-                <View style = {styles.btnStatus}>
-                    <TouchableOpacity>
-                        <View style = {{margin: 5}}>
-                            <Text>
-                                서제에 담긴 수
-                            </Text>
-                        </View>
-                    </TouchableOpacity >
-                    <View style={[styles.divider]} />
-                    <TouchableOpacity onPress={toggle}>
-                        <View style = {{margin: 5}}>
-                            <Text>
-                                키워드 확인
-                            </Text>
-                        </View>
-                    </TouchableOpacity>
+            ) : showLibrarys ? (
+                <View>
+                    <Button title='뒤로가기' onPress={librarys} />
+                    <FlatList
+                        data={library}
+                        renderItem={renderItem}
+                        keyExtractor={(item) => item.libCode}
+                    />
                 </View>
-                
-            </View>
-            <View style = {{flexDirection: 'column', alignItems: 'center'}}>
-                <TouchableOpacity>
-                    <View style = {styles.btnStatus}>
-                        <Text style = {{textAlign: 'center', margin: 5}}>
-                            도서 소장 도서관 검색
+            ) : (
+                <>
+                    <View style={styles.titleView}>
+                        <Text style={{ fontSize: 20 }}>
+                            {data[0]?.title || 'No Title'}
                         </Text>
                     </View>
-                </TouchableOpacity>
-            </View>
-            
-            </>
+                    <View style={styles.textView}>
+                        <Text style={{ fontSize: 15 }}>
+                            {data[0]?.writer || 'No Writer'}
+                        </Text>
+                    </View>
+                    <View style={styles.textView}>
+                        <Text style={{ fontSize: 15 }}>
+                            { `출판사: ${data[0]?.publisher}` || 'No Publisher'}
+                        </Text>
+                    </View>
+                    <View style={styles.classificationView}>
+                        <Text>
+                            {data[0]?.class || 'No Classification'}
+                        </Text>
+                    </View>
+                    <View style={styles.bookIntroduction}>
+                        <ScrollView>
+                            <Text>
+                                {data[0]?.description || 'No Description'}
+                            </Text>
+                        </ScrollView>
+                    </View>
+                    <View style={{ alignItems: 'center', marginTop: 5 }}>
+                        <View style={styles.btnStatus}>
+                            <TouchableOpacity>
+                                <View style={{ margin: 5 }}>
+                                    <Text>
+                                        서제에 담긴 수
+                                    </Text>
+                                </View>
+                            </TouchableOpacity >
+                            <View style={[styles.divider]} />
+                            <TouchableOpacity onPress={toggle}>
+                                <View style={{ margin: 5 }}>
+                                    <Text>
+                                        키워드 확인
+                                    </Text>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                    <View style={{ flexDirection: 'column', alignItems: 'center' }}>
+                        <TouchableOpacity onPress={librarys}>
+                            <View style={styles.btnStatus}>
+                                <Text style={{ textAlign: 'center', margin: 5, }}>
+                                    도서 소장 도서관 검색
+                                </Text>
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+                </>
             )}
         </View>
-    )
+    );
 }
