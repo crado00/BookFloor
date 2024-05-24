@@ -1,13 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Button, Text , Image, TouchableOpacity, TextInput} from 'react-native';
+import { View, StyleSheet, Button, Text , Image, TouchableOpacity, TextInput, Dimensions} from 'react-native';
 import { retrieveUserData } from './rogin/auth'
+import { FlatList } from 'react-native-gesture-handler';
+import { launchImageLibrary } from 'react-native-image-picker';
+
+
+interface library{
+    libCode: string,
+    libName: string,
+    tel: string,
+    closed: string,
+    operatingTime: string,
+    address: string
+}
 
 export default function profileChange(){
 
     const [name, setName] = useState('유저이름');
+    const screenWidth = Dimensions.get('window').width;
+    const [imageUri, setImageUri] = useState<string | null>(null);
 
-    
-    
       useEffect(() => {
         const fetchData = async () => {
           const data = await retrieveUserData();
@@ -20,12 +32,47 @@ export default function profileChange(){
     const btn = () => {
         
     }
+    const imgChange = (setImageUri: React.Dispatch<React.SetStateAction<{ uri: string } | null>>) => {
+        launchImageLibrary({
+            mediaType: 'photo'
+        }, (response) => {
+          if (response.didCancel) {
+            console.log('User cancelled image picker');
+          } else if (response.errorMessage) {
+            console.log('ImagePicker Error: ', response.errorMessage);
+          } else if (response.assets && response.assets.length > 0) {
+            const uri = response.assets[0].uri || ''; // undefined인 경우 빈 문자열로 대체
+            const source = { uri };
+            setImageUri(source);
+          }
+        });
+      };
+    const libraryData = [
+        {
+            libCode: '1',
+            libName: '도서관',
+            tel: '010-2345-6789',
+            closed: '휴관일',
+            operatingTime: '운영시간',
+            address: '주소'
+        }
+    ];
+
+    const renderItem = ({item}: {item: library}) => (
+        <TouchableOpacity style = {{margin: 10, borderWidth: 2, borderColor: 'black',}}>
+            <View>
+                <Text>{item.libName}</Text>
+                <Text>{item.closed} {item.operatingTime}</Text>
+                <Text>{item.address}</Text>
+            </View>
+        </TouchableOpacity>
+    )
 
     return (
         <View style = {styles.container}>
-            <TouchableOpacity style = {{margin: 30}}>
+            <TouchableOpacity style = {{margin: 30}} onPress={imgChange}>
                 <View style = {styles.circle}>
-                    <Image style = {styles.image}/>
+                    <Image style = {styles.image} source={{uri: imageUri}}/>
                 </View>
             </TouchableOpacity>
             <View style = {{flexDirection: "row"}}>
@@ -39,12 +86,30 @@ export default function profileChange(){
                     <TextInput placeholder = {name} />
                 </View>
             </View>
+            
+            <View style = { { flex:1, width: screenWidth - 40, marginTop:20} }>
+                <View style = { { flexDirection: 'row',} }>
+                    <View style = {{flex: 1, borderWidth: 2, borderColor: 'black',}}>
+                        <TextInput placeholder = '도서관'/>                        
+                    </View>
+                    <Button title='검색'/>
+                    <Button title='지도'/>
+                </View >
+                <FlatList
+                    data={libraryData}
+                    renderItem={renderItem}
+                    keyExtractor={(item) => item.libCode}
+                    style = {{borderWidth: 2, borderColor: 'black',}}
+                    
+                />
+            </View>
+
             <View style = {{flexDirection: "row"}}>
                 <View style = {{flex:1, margin:20,}}>
                     <Button title='저장' onPress={btn}/>
                 </View>
             </View>
-            
+
         </View>
     )
 } 

@@ -22,7 +22,9 @@ const MyPage = () =>{
   const pfcp = () =>{
     navigation.navigate('profileChange')
   }
-
+  const myStudy = () =>{
+    navigation.navigate('myStudy')
+  }
     return(
     <View style = {styles.container}>
         <Text style = {styles.titles}>프로필</Text>
@@ -30,6 +32,7 @@ const MyPage = () =>{
         <View style = {styles.circle}>
           <Image 
           style = {styles.image}
+          source={ { uri: 'https://gongu.copyright.or.kr/gongu/wrt/cmmn/wrtFileImageView.do?wrtSn=9046601&filePath=L2Rpc2sxL25ld2RhdGEvMjAxNC8yMS9DTFM2L2FzYWRhbFBob3RvXzI0MTRfMjAxNDA0MTY=&thumbAt=Y&thumbSe=b_tbumb&wrtTy=10004' } }
           />
         </View>
         <View style = {styles.profile2}>
@@ -37,12 +40,8 @@ const MyPage = () =>{
             <Text style = {styles.userName}>{Name}</Text>
           </View>
           <View style = {styles.profile3}>
-            <View >
               <Button title='프로필 변경'onPress={pfcp}/>
-            </View>
-            <View>
-              <Button title='위치 변경'/>
-            </View>
+              <Button title='내 서재' onPress={myStudy}/>
           </View>
         </View>
         

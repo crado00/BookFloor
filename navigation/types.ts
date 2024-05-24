@@ -9,5 +9,6 @@ export declare module CommonType {
         searchPage: undefined;
         bookDetailsPage: undefined;
         profileMake: undefined;
+        myStudy: undefined;
     };
 }

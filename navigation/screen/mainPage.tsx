@@ -14,11 +14,6 @@ interface bookRank{
     img: string;
 }
 
-interface bookSuggestion{
-    bookId: string;
-    bookName: string;
-    img: string;
-}
     
 
 export default function(){
