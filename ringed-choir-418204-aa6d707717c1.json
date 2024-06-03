@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "ringed-choir-418204",
+  "private_key_id": "aa6d707717c1ccdfcad23baf4754dd58db2e33ce",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCYrot0SmNWwmBy\npOwl0idIivq9lQlzBPJ51hBcOqDBJrpCtluX/Cs9yiqXcG4bow76L54qFuB00SBI\nR8PNps+Ywh296Tln/4I6slvH3BsvToCWwA60YHjwwRvCss4vBJTcBmNe8WwIMrxd\nC6AMHaTDQaErv8eQdKh1pRWQDhiJW2/OkJu+gj0dr1ifdwsKo5+lX3cqFIBglYTd\nKYAZvJkJDq3b49zE8Pgg6kxorYEaPd+/5FmO+YxOc50q+XBRx4uWStlADdNL5SAb\nD3n0dle1Eftrrx3HjFkRjh/11INcjkQ1t22FZWHV8UuKQ3oPknFt3TacbY8XQ9cJ\ncRln0QhxAgMBAAECggEABJa3sZQMGO8Ymk7N8MkNzdwCHdvdKoF15CbZ27EWDxgM\niwq+BVBaiwMzdSpiNMnEHngl5xqZk7PhUNV5/glLE0qU6ECagr9ReQAj9VrDz7p/\n74fwKTL+ZNtOQUjBx59PS1mUd6WxMIHjMAy0ZQjTCzHtbR+DbkUDTHMyCwqmvsyz\nysTBifQveshXgyARqA5vbe+AGcrgVMLsevY8Yyg0cfg7h9qtfno0h5GN0sIDXaKu\nCiHdMAO7L3HTDr3N9cR8momk/cg5BRuBCchoFt+ANYJN0C4myBB20hpIbJGyLHRL\nL7aJOb9595Zktp8mCloqEmS/Ssa0H05giKWdhqdNkQKBgQDWjPMrW5VW4hGxmCFs\nLu2AJH0k7qLRG7dGlndQzIhEHGT81Oz4JOEBsoe0AYh2tNXnPUZzuH70No/nyp7Y\nEm2JH1ZQHeciZprO6cOVhBvgJa3TWpdxw9JYSWtK/eF/K4BuRJgdZqWC/zfKJTF/\nWtMgspQ/uCr24gjStqv8OJxJfQKBgQC2Lb6r83ImcVxILPNY6tzgxAuEcx46IBiy\n6yWCsSl3Qewr9/2bNvRoZuwvFe8WI6KAAgtg77QwT2LMZPbQzBh/zA3ayVpbzukU\nalberw2DbfccskLp+5fV530uGs8tgMCXxXzxjQD60U49dhIyT9zv37NSXd7VSwtL\ngEiqbZ1NBQKBgDHspoEGVJ/dByT+M3jLCrTwyLYZWYWzH1irlqQUk/jVaqJyoZm0\nay9L7cvzN1/4AHZIieZPnisRrzbOrVu2Hgr0Yc9OxgP5QDi5qKtYDGyCGArAX9E3\nMfEdVHwky54d70q5Z3Qf+I+c98xwDy6FYe+P3nNdVZIRUuBFZYvRWHy5AoGBAJQo\n4d/QLm7LVMSyIfqXj6kQZ1mBkfytq8ie6rO+Rz3hFCSyG8OGzwC1a7Hjgb0coATB\nJOXiLEX52hzmo8AtrGMK3d2oUd9GiFJ9JUcXUMMpxIXHCBpo7hQdnrXHQeT8yCTm\njPWZuklBvgLIKoZWYxWGdb0v8JDA5l+x5ecNHJfNAoGBAJGo0f7VsP8bFNMAWNO2\nAqPJ0vuI2LGh46N9exHY4nuyH+HOIHxrVg4pOwHnbzEdvkhVRJvRbtbwYFUfJLOv\n5s6UbSz2Sphhak9+Am2Lf2Oiiq6SHiV5wgIqEEEYYdXFdTsLsLIWtyWCx+oS/xAc\ng7jViSQ9VSNqH/Jv+qvnplQs\n-----END PRIVATE KEY-----\n",
+  "client_email": "kth-s-ocr-test@ringed-choir-418204.iam.gserviceaccount.com",
+  "client_id": "105037905331498000534",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/kth-s-ocr-test%40ringed-choir-418204.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
