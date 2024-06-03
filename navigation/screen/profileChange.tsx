@@ -3,7 +3,7 @@ import { View, StyleSheet, Button, Text , Image, TouchableOpacity, TextInput, Di
 import { retrieveUserData } from './rogin/auth'
 import { FlatList } from 'react-native-gesture-handler';
 import { launchImageLibrary } from 'react-native-image-picker';
-
+import { useNavigation } from '@react-navigation/native';
 
 interface library{
     libCode: string,
@@ -11,11 +11,13 @@ interface library{
     tel: string,
     closed: string,
     operatingTime: string,
-    address: string
+    address: string,
+    latitude: number,
+    longitude: number
 }
 
 export default function profileChange(){
-
+    const navigation = useNavigation();
     const [name, setName] = useState('유저이름');
     const screenWidth = Dimensions.get('window').width;
     const [imageUri, setImageUri] = useState<string | null>(null);
@@ -54,7 +56,9 @@ export default function profileChange(){
             tel: '010-2345-6789',
             closed: '휴관일',
             operatingTime: '운영시간',
-            address: '주소'
+            address: '주소',
+            latitude: 37.498040483,
+            longitude: 127.02758183,
         }
     ];
 
@@ -67,7 +71,9 @@ export default function profileChange(){
             </View>
         </TouchableOpacity>
     )
-
+    const map = () =>{
+        navigation.navigate('libsel', {data: libraryData});
+    }
     return (
         <View style = {styles.container}>
             <TouchableOpacity style = {{margin: 30}} onPress={imgChange}>
@@ -90,10 +96,10 @@ export default function profileChange(){
             <View style = { { flex:1, width: screenWidth - 40, marginTop:20} }>
                 <View style = { { flexDirection: 'row',} }>
                     <View style = {{flex: 1, borderWidth: 2, borderColor: 'black',}}>
-                        <TextInput placeholder = '도서관'/>                        
+                        <TextInput placeholder = '주요 방문 도서관'/>                        
                     </View>
                     <Button title='검색'/>
-                    <Button title='지도'/>
+                    <Button title='지도' onPress={map}/>
                 </View >
                 <FlatList
                     data={libraryData}

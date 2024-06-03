@@ -4,15 +4,14 @@ import { createStackNavigator, StackNavigationOptions } from '@react-navigation/
 import { CommonType } from './types';
 import SignIn from './screen/SignIn';
 import SignUp from './screen/SignUp';
-import MyPage from './screen/MyPage';
 import profileChange from './screen/profileChange';
-import mainPage from './screen/mainPage';
 import ocrPage from './screen/ocrPage';
 import pageGruep from './screen/pageGruep';
 import searchPage from './screen/searchPage';
 import bookDetailsPage from './screen/bookDetailsPage';
 import profileMake from './screen/profileMake';
 import myStudy from './screen/myStudy';
+import libsel from './screen/libsel';
 
 const StackNavigation = () => {// 스택 내비게이션을 설정하는 컴포넌트
     
@@ -40,12 +39,13 @@ const StackNavigation = () => {// 스택 내비게이션을 설정하는 컴포�
                 <Stack.Screen name='SignUp'component={SignUp} options={{ headerShown: false }}>
                 </Stack.Screen>
                 <Stack.Screen name='profileChange' component = {profileChange}/>
-                <Stack.Screen name='ocrPage' component = {ocrPage} options = {{headerShown: false }}/>
+                <Stack.Screen name='ocrPage' component = {ocrPage}/>
                 <Stack.Screen name='pageGruep' component={pageGruep} options={{headerShown: false, gestureEnabled: false}}/>
                 <Stack.Screen name='searchPage' component={searchPage} />
                 <Stack.Screen name='bookDetailsPage' component={bookDetailsPage}/>
                 <Stack.Screen name='profileMake' component={profileMake} options={{headerShown: false}}/>
                 <Stack.Screen name='myStudy' component={myStudy} />
+                <Stack.Screen name='libsel' component={libsel} />
             </Stack.Navigator>
         </NavigationContainer >
     )

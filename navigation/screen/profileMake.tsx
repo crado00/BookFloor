@@ -16,7 +16,9 @@ interface library {
     tel: string,
     closed: string,
     operatingTime: string,
-    address: string
+    address: string,
+    latitude: number,
+    longitude: number
 }
 
 interface StateType {
@@ -37,6 +39,7 @@ const styles = StyleSheet.create({
     },
     textInputView: {
         flexDirection: 'row',
+        marginBottom: 10
     },
     textView: {
         margin: 10,
@@ -83,51 +86,16 @@ const styles = StyleSheet.create({
     libContainer: {
         backgroundColor: 'gray',
         margin: 10,
-        height: 200,
+        height: 400,
         width: screenWidth - 40,
+    },
+    searchView: {
+        flexDirection: 'row',
+        marginRight: 10,
+        marginLeft: 10,
+        marginBottom: 10
     }
 });
-
-const btn =  [
-    {
-        btnId: '1',
-        btnName: '카테고리 1'
-    },
-    {
-        btnId: '2',
-        btnName: '카테고리 2'
-    },
-    {
-        btnId: '3',
-        btnName: '카테고리 3'
-    },
-    {
-        btnId: '4',
-        btnName: '카테고리 4'
-    },
-    {
-        btnId: '5',
-        btnName: '카테고리 5'
-    },
-    {
-        btnId: '6',
-        btnName: '카테고리 6'
-    },
-    {
-        btnId: '7',
-        btnName: '카테고리 7'
-    },
-    {
-        btnId: '8',
-        btnName: '카테고리 8'
-    },
-    {
-        btnId: '9',
-        btnName: '카테고리 9'
-    },
-];
-
-
 
 
 
@@ -139,38 +107,7 @@ export default function() {
     const navigation = useNavigation();
     
     const [imageUri, setImageUri] = useState<string | null>(null);
-
-    const [categoryTF, setCategoryTF] = useState<StateType>({
-        value1: false,
-        value2: false,
-        value3: false,
-        value4: false,
-        value5: false,
-        value6: false,
-        value7: false,
-        value8: false,
-        value9: false,
-    });
-
-    const toggleValue = (key: string) => {
-        setCategoryTF(prevState => ({
-            ...prevState,
-            [key]: !prevState[key as keyof typeof categoryTF],
-        }));
-    };
-
-    const renderItem = ({ item }: { item: btn }) => (
-        <View style={styles.btnView}>
-            <TouchableOpacity
-                onPress={() => toggleValue(`value${item.btnId}`)}
-                style={[styles.button, categoryTF[`value${item.btnId}`] ? styles.activeButton : null]}
-            >
-                <Text style={{ textAlign: 'center' }}>
-                    {item.btnName}
-                </Text>
-            </TouchableOpacity>
-        </View>
-    );
+    const [searchdata, setSearchData] =useState<string>("");
 
     const backbtn = () => {
         navigation.goBack();
@@ -196,7 +133,16 @@ export default function() {
         // 저장 부분
         navigation.navigate('pageGruep');
     }
-
+    const maplib = () => {
+        navigation.navigate('libsel', {data: libraryData});
+    }
+    const search = () => {
+        //도서관 이름 검색
+        
+    }
+    const onSearch = (input) => {
+        setSearchData(input)
+    }
     const libraryData = [
         {
             libCode: '1',
@@ -204,7 +150,19 @@ export default function() {
             tel: '010-2345-6789',
             closed: '휴관일',
             operatingTime: '운영시간',
-            address: '주소'
+            address: '주소',
+            latitude: 37.498040483,
+            longitude: 127.02758183,
+        },
+        {
+            libCode: '2',
+            libName: '도서관',
+            tel: '010-2345-6789',
+            closed: '휴관일',
+            operatingTime: '운영시간',
+            address: '주소',
+            latitude: 33.38,
+            longitude: 126.55,
         }
     ];
     
@@ -221,10 +179,11 @@ export default function() {
     return (
         <View style={{ flex: 1, backgroundColor: 'white', alignItems: 'center', justifyContent: 'center' }}>
             <View style={styles.titleView}>
-                <Text style={{ fontSize: 50, margin: 10 }}>
+                <Text style={{ fontSize: 50, margin: 10, }}>
                     책마루
                 </Text>
             </View>
+
             <TouchableOpacity onPress={imgChange}>
                 <View style={styles.imgView}>
                     <Image source={{ uri: imageUri }} style={{ width: '100%', height: '100%' }} />
@@ -236,31 +195,20 @@ export default function() {
                 <Button title='중복확인' onPress={identification} />
             </View>
             <View style={{ flex: 1, backgroundColor: '#E1FFFF', width: screenWidth, alignItems: 'center' }}>
-                <View style={styles.textView}>
-                    <Text>
-                        취향 카테고리 설정
-                    </Text>
-                    <Text>
-                        평소 즐겨 읽는 분야의 카테고리를 선택하세요.
-                    </Text>
-                </View>
-                <View style={styles.scroloView}>
-                    <FlatList
-                        data={btn}
-                        renderItem={renderItem}
-                        keyExtractor={(item) => item.btnId}
-                        numColumns={4}
-                        contentContainerStyle={{ alignItems: 'center' }}
-                    />
-                </View>
+                
                 <View style={styles.libContainer}>
-                    <Text style={{ fontSize: 30 }}>도서관 선택</Text>
+                    <Text style={{ fontSize: 30, color: 'white', margin: 10 }}>도서관 선택</Text>
+                    
+                    <View style ={styles.searchView}>
+                        <TextInput placeholder='도서관 이름을 입력하세요.' style={{ borderWidth: 2, borderColor: 'black', backgroundColor: 'white', flex: 1}} value={searchdata} onChangeText={onSearch}/>
+                        <Button title='검색' onPress={search}/>
+                    </View>
                     <FlatList
                         data={libraryData}
                         renderItem={lib}
                         keyExtractor={(item) => item.libCode}
                     />
-                    <Button title='지도에서 찾기'/>
+                    <Button title='지도에서 찾기' onPress={maplib}/>
                 </View>
                 <View style={styles.nextOrBack}>
                     <Button title='뒤로' onPress={backbtn} />

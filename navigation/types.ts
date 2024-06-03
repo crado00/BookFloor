@@ -10,5 +10,6 @@ export declare module CommonType {
         bookDetailsPage: undefined;
         profileMake: undefined;
         myStudy: undefined;
+        libsel: undefined;
     };
 }

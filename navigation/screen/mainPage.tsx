@@ -75,7 +75,7 @@ export default function(){
 
     const ocrbtn = () =>{
         
-        //navigation.navigate('ocrPage');
+        navigation.navigate('ocrPage');
         
     }
     const bookBtn = (id : string) => {
