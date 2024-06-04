@@ -1,25 +1,24 @@
-package com.example.myapplication
+package com.projectname.ocr
 
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.Body
-import retrofit2.http.POST
+import android.graphics.Bitmap
+import com.facebook.react.bridge.Promise
+import com.facebook.react.bridge.ReactApplicationContext
+import com.facebook.react.bridge.ReactContextBaseJavaModule
+import com.facebook.react.bridge.ReactMethod
 
-data class PairData(val pair: Pair<String, String>)
+class ApiService(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
 
-interface ApiService {
-    @POST("/upload")
-    suspend fun uploadPairs(@Body pairs: List<PairData>)
-}
+    override fun getName() = "ApiService"
 
-val retrofit = Retrofit.Builder()
-    .baseUrl("https://your-server.com/")
-    .addConverterFactory(GsonConverterFactory.create())
-    .build()
-
-val apiService = retrofit.create(ApiService::class.java)
-
-suspend fun uploadData(pairs: List<Pair<String, String>>) {
-    val pairDataList = pairs.map { PairData(it) }
-    apiService.uploadPairs(pairDataList)
+    @ReactMethod
+    fun performOCR(imagePath: String, promise: Promise) {
+        try {
+            val bitmap = BitmapFactory.decodeFile(imagePath)
+            val ocrHelper = OCRHelper()
+            val result = ocrHelper.recognizeText(bitmap)
+            promise.resolve(result)
+        } catch (e: Exception) {
+            promise.reject("OCR_ERROR", e)
+        }
+    }
 }

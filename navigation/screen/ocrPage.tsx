@@ -1,46 +1,47 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Button, Text, Image, Dimensions } from 'react-native';
-import { Camera, useCameraDevice, useCameraPermission } from 'react-native-vision-camera';
+import { View, StyleSheet, Button, Text, Image, Dimensions, NativeModules } from 'react-native';
+import { Camera, useCameraDevices, CameraPermissionStatus, PhotoFile } from 'react-native-vision-camera';
+
+const { ApiService } = NativeModules;
 
 export default function App() {
   const screenWidth = Dimensions.get('screen').width;
   const screenHeight = Dimensions.get('screen').height;
-  const { hasPermission, requestPermission } = useCameraPermission();
+  const [permission, setPermission] = useState<CameraPermissionStatus | null>(null);
   const [photoView, setPhotoView] = useState(false);
-  const [capturedPhoto, setCapturedPhoto] = useState(null);
-  const [ocrText, setOcrText] = useState("a")
-  const device = useCameraDevice('back');
-  const camera = useRef(null);
+  const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
+  const [ocrText, setOcrText] = useState("a");
+  const devices = useCameraDevices();
+  const camera = useRef<Camera>(null);
 
   useEffect(() => {
     const requestCameraPermission = async () => {
-      await requestPermission();
+      const status = await Camera.requestCameraPermission();
+      setPermission(status);
     };
 
     requestCameraPermission();
-  }, [requestPermission]);
+  }, []);
 
   const takePhoto = async () => {
-    console.log('확인1');
-    if (!camera.current) return;
-    console.log('확인2');
+    if (camera.current == null) return;
     try {
-      const photo = await camera.current.takePhoto({
+      const photo: PhotoFile = await camera.current.takePhoto({
         flash: 'off',
-        qualityPrioritization: 'speed',
       });
-      console.log('확인3');
-      console.log(photo);
       setCapturedPhoto(photo.path);
       setPhotoView(true);
+
+      // OCR 기능 호출
+      const ocrResult = await ApiService.performOCR(photo.path);
+      setOcrText(ocrResult);
+
     } catch (error) {
       console.error('Error taking photo:', error);
     }
   };
-  const cansel = () => {
-    setPhotoView(false);
-  }
-  if (hasPermission === null) {
+
+  if (permission === null || permission === 'not-determined') {
     return (
       <View style={styles.container}>
         <Text>Requesting for camera permission...</Text>
@@ -48,7 +49,7 @@ export default function App() {
     );
   }
 
-  if (hasPermission === false) {
+  if (permission === 'denied') {
     return (
       <View style={styles.container}>
         <Text>Camera permission denied</Text>
@@ -56,38 +57,44 @@ export default function App() {
     );
   }
 
+  if (!devices.back) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading camera...</Text>
+      </View>
+    );
+  }
+
   return (
-    <View style={{flex: 1}}>
-        {photoView ? (
-          <View style = {styles.container}>
-            <View style={styles.cameraContainer}>
-              <Image source={{ uri: `file://${capturedPhoto}` }} style={styles.image} />
-            </View>
-            <View style={styles.buttonContainer}>
-              <View style = {{borderWidth: 2, borderColor: 'gray', width: 300, height: 200, padding: 7}}>
-                <Text style={{flex: 1}}>{ocrText}</Text>
-              </View>
-              <Button title="되돌리기" onPress={cansel} />
-            </View>
+    <View style={{ flex: 1 }}>
+      {photoView ? (
+        <View style={styles.container}>
+          <View style={styles.cameraContainer}>
+            <Image source={{ uri: `file://${capturedPhoto}` }} style={styles.image} />
           </View>
-
-        ) : (
-          <View style = {styles.container}>
-            <View style={styles.cameraContainer}>
-              <Camera
-                style={StyleSheet.absoluteFill}
-                device={device}
-                isActive={true}
-                photo={true}
-                ref={camera}
-              />
+          <View style={styles.buttonContainer}>
+            <View style={{ borderWidth: 2, borderColor: 'gray', width: 300, height: 200, padding: 7 }}>
+              <Text style={{ flex: 1 }}>{ocrText}</Text>
             </View>
-            <View style={styles.buttonContainer}>
-              <Button title="사진 찍기" onPress={takePhoto} />
-            </View>
+            <Button title="되돌리기" onPress={() => setPhotoView(false)} />
           </View>
-        )}
-
+        </View>
+      ) : (
+        <View style={styles.container}>
+          <View style={styles.cameraContainer}>
+            <Camera
+              style={StyleSheet.absoluteFill}
+              device={devices.back}
+              isActive={true}
+              photo={true}
+              ref={camera}
+            />
+          </View>
+          <View style={styles.buttonContainer}>
+            <Button title="사진 찍기" onPress={takePhoto} />
+          </View>
+        </View>
+      )}
     </View>
   );
 }
