@@ -40,7 +40,7 @@ export default function(){
             bookId: 'b1',
             bookName: '확인용',
             img: 'https://gongu.copyright.or.kr/gongu/wrt/cmmn/wrtFileImageView.do?wrtSn=9046601&filePath=L2Rpc2sxL25ld2RhdGEvMjAxNC8yMS9DTFM2L2FzYWRhbFBob3RvXzI0MTRfMjAxNDA0MTY=&thumbAt=Y&thumbSe=b_tbumb&wrtTy=10004',
-        }
+        },
     ]
 
     const searchWordChange = (input: string) => {

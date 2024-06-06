@@ -1,16 +1,25 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Button, Text, Image, Dimensions } from 'react-native';
+import { View, Button, Text, Image, Dimensions, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { Camera, useCameraDevice, useCameraPermission } from 'react-native-vision-camera';
+import axios from 'axios';
+import RNFS from 'react-native-fs';
+
+const { width: screenWidth, height: screenHeight } = Dimensions.get('screen');
+
+interface bookData {
+  bookId: string;
+  bookName: string;
+  img: string;
+}
 
 export default function App() {
-  const screenWidth = Dimensions.get('screen').width;
-  const screenHeight = Dimensions.get('screen').height;
   const { hasPermission, requestPermission } = useCameraPermission();
   const [photoView, setPhotoView] = useState(false);
-  const [capturedPhoto, setCapturedPhoto] = useState(null);
-  const [ocrText, setOcrText] = useState("a")
+  const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
+  const [ocrText, setOcrText] = useState('');
+  const [textPairs, setTextPairs] = useState<string[]>([]);
   const device = useCameraDevice('back');
-  const camera = useRef(null);
+  const camera = useRef<Camera>(null);
 
   useEffect(() => {
     const requestCameraPermission = async () => {
@@ -18,28 +27,108 @@ export default function App() {
     };
 
     requestCameraPermission();
-  }, [requestPermission]);
+  }, []);
 
+  const temData = [
+    {
+      bookId: '1',
+      bookName: '임시데이터 1',
+      bookImg: 'https://gongu.copyright.or.kr/gongu/wrt/cmmn/wrtFileImageView.do?wrtSn=9046601&filePath=L2Rpc2sxL25ld2RhdGEvMjAxNC8yMS9DTFM2L2FzYWRhbFBob3RvXzI0MTRfMjAxNDA0MTY=&thumbAt=Y&thumbSe=b_tbumb&wrtTy=10004',
+
+    },
+    {
+      bookId: '2',
+      bookName: '임시데이터 2',
+      bookImg: 'https://gongu.copyright.or.kr/gongu/wrt/cmmn/wrtFileImageView.do?wrtSn=9046601&filePath=L2Rpc2sxL25ld2RhdGEvMjAxNC8yMS9DTFM2L2FzYWRhbFBob3RvXzI0MTRfMjAxNDA0MTY=&thumbAt=Y&thumbSe=b_tbumb&wrtTy=10004',
+
+    },
+    {
+      bookId: '3',
+      bookName: '임시데이터 3',
+      bookImg: 'https://gongu.copyright.or.kr/gongu/wrt/cmmn/wrtFileImageView.do?wrtSn=9046601&filePath=L2Rpc2sxL25ld2RhdGEvMjAxNC8yMS9DTFM2L2FzYWRhbFBob3RvXzI0MTRfMjAxNDA0MTY=&thumbAt=Y&thumbSe=b_tbumb&wrtTy=10004',
+
+    },
+    {
+      bookId: '4',
+      bookName: '임시데이터 4',
+      bookImg: 'https://gongu.copyright.or.kr/gongu/wrt/cmmn/wrtFileImageView.do?wrtSn=9046601&filePath=L2Rpc2sxL25ld2RhdGEvMjAxNC8yMS9DTFM2L2FzYWRhbFBob3RvXzI0MTRfMjAxNDA0MTY=&thumbAt=Y&thumbSe=b_tbumb&wrtTy=10004',
+
+    }
+  ]
   const takePhoto = async () => {
-    console.log('확인1');
     if (!camera.current) return;
-    console.log('확인2');
     try {
       const photo = await camera.current.takePhoto({
         flash: 'off',
-        qualityPrioritization: 'speed',
       });
-      console.log('확인3');
-      console.log(photo);
       setCapturedPhoto(photo.path);
       setPhotoView(true);
+      console.log('Photo taken:', photo.path);
+      await extractText('photo.path');
     } catch (error) {
       console.error('Error taking photo:', error);
     }
   };
-  const cansel = () => {
+
+  const extractText = async (imageUri: string) => {
+    console.log('Starting text extraction');
+    
+    try {
+      const base64Data = await RNFS.readFile(imageUri, 'base64');
+      console.log('Base64 data:', base64Data.slice(0, 100)); // Base64 데이터의 첫 100자만 로그로 출력
+
+      const data = {
+        requests: [
+          {
+            image: {
+              content: base64Data, // base64 데이터 직접 사용
+            },
+            features: [
+              {
+                type: 'TEXT_DETECTION',
+              },
+            ],
+          },
+        ],
+      };
+
+      const response = await axios.post(
+        'https://vision.googleapis.com/v1/images:annotate?key=AIzaSyDbsEDrJQFrZNdzQNpCEWo8A9hqCuQNa-I', // API 키를 여기에 입력하세요
+        data,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      console.log('Response from Google Vision API:', response.data);
+
+      if (response.data.responses[0].error) {
+        console.error('API Error:', response.data.responses[0].error);
+      } else {
+        const detectedText = response.data.responses[0].fullTextAnnotation?.text || '';
+        setOcrText(detectedText);
+        processText(detectedText);
+      }
+    } catch (error) {
+      console.error('Error during OCR request:', error.response?.data || error.message);
+    }
+  };
+
+  const processText = (text: string) => {
+    const splitText = text.split('~');
+    const pairs: string[] = [];
+    for (let i = 0; i < splitText.length - 1; i += 1) {
+      pairs.push(`${splitText[i]}`);
+    }
+    setTextPairs(pairs);
+  };
+
+  const cancel = () => {
     setPhotoView(false);
-  }
+  };
+
   if (hasPermission === null) {
     return (
       <View style={styles.container}>
@@ -56,24 +145,41 @@ export default function App() {
     );
   }
 
+  const renderItem =  ({item}: {item: bookData}) =>{
+    <TouchableOpacity>
+      <View style = {{flexDirection: 'row'}}>
+        <View style ={{width: 100, height: 100}}>
+          <Image source={{uri: item.img}} style = {{width: '100%', height: '100%'}}/>
+        </View>
+        <View>
+          <Text>{item.bookName}</Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  }
   return (
-    <View style={{flex: 1}}>
-        {photoView ? (
-          <View style = {styles.container}>
-            <View style={styles.cameraContainer}>
-              <Image source={{ uri: `file://${capturedPhoto}` }} style={styles.image} />
-            </View>
-            <View style={styles.buttonContainer}>
-              <View style = {{borderWidth: 2, borderColor: 'gray', width: 300, height: 200, padding: 7}}>
-                <Text style={{flex: 1}}>{ocrText}</Text>
-              </View>
-              <Button title="되돌리기" onPress={cansel} />
-            </View>
+    <View style={{ flex: 1 }}>
+      {photoView ? (
+        <View style={styles.container}>
+          <View style={styles.cameraContainer}>
+            <Image source={{ uri: `file://${capturedPhoto}` }} style={styles.image} />
           </View>
-
-        ) : (
-          <View style = {styles.container}>
-            <View style={styles.cameraContainer}>
+          <View style={styles.buttonContainer}>
+            <View style={{ borderWidth: 2, borderColor: 'gray', width: 300, height: 200, padding: 7 }}>
+              <Text style={{ flex: 1 }}>{ocrText}</Text>
+            </View>
+            <Button title="되돌리기" onPress={cancel} />
+          </View>
+          <View style={styles.textPairContainer}>
+            {textPairs.map((pair, index) => (
+              <Text key={index} style={styles.pairText}>{pair}</Text>
+            ))}
+          </View>
+        </View>
+      ) : (
+        <View style={styles.container}>
+          <View style={styles.cameraContainer}>
+            {device && (
               <Camera
                 style={StyleSheet.absoluteFill}
                 device={device}
@@ -81,13 +187,13 @@ export default function App() {
                 photo={true}
                 ref={camera}
               />
-            </View>
-            <View style={styles.buttonContainer}>
-              <Button title="사진 찍기" onPress={takePhoto} />
-            </View>
+            )}
           </View>
-        )}
-
+          <View style={styles.buttonContainer}>
+            <Button title="사진 찍기" onPress={takePhoto} />
+          </View>
+        </View>
+      )}
     </View>
   );
 }
@@ -98,8 +204,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cameraContainer: {
-    width: Dimensions.get('screen').width,
-    height: Dimensions.get('screen').height * 0.5,
+    width: screenWidth,
+    height: screenHeight * 0.5,
     marginTop: 50,
   },
   image: {
@@ -107,8 +213,12 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   buttonContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    marginTop: 20,
+  },
+  textPairContainer: {
+    marginTop: 20,
+  },
+  pairText: {
+    marginTop: 10,
   },
 });

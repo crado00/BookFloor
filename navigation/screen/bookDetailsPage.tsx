@@ -140,7 +140,10 @@ export default function() {
                 </View>
             ) : showLibrarys ? (
                 <View>
-                    <Button title='뒤로가기' onPress={librarys} />
+                    <View >
+                        <Button title='뒤로가기' onPress={librarys} />
+                        <Button title='지도에서 찾기' />
+                    </View>
                     <FlatList
                         data={library}
                         renderItem={renderItem}
