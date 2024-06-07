@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useMemo } from 'react';
-import { View, Platform, Text, Image, PermissionsAndroid } from 'react-native';
+import { View, Platform, Text, Image, PermissionsAndroid, TouchableOpacity, ToastAndroid, Button, TextInput, StyleSheet } from 'react-native';
 import {
   type MapType,
   type NaverMapViewRef,
@@ -78,7 +78,7 @@ type Location = {
 export default function mapPage({ libraries }: MapPageProps) {
   const ref = useRef<NaverMapViewRef>(null);
 
-  const [camera, setCamera] = useState(Cameras.Jeju);
+  const [camera, setCamera] = useState(Cameras.Seolleung);
 
   const [nightMode, setNightMode] = useState(false);
   const [indoor, setIndoor] = useState(false);
@@ -90,10 +90,11 @@ export default function mapPage({ libraries }: MapPageProps) {
   const [indoorLevelPicker, setIndoorLevelPicker] = useState(true);
   const [myLocation, setMyLocation] = useState(true);
   const [currentLocation, setCurrentLocation] = useState<Location>({latitude:0, longitude:0, zoom: 14})
-  
+  const [libdata, setlibdata] = useState(libraries)
 
-
+  const [search, setSearch] =useState("")
   
+  const [selectedLibrary, setSelectedLibrary] = useState(null);
 
   useEffect(() => {
     if (Platform.OS === 'ios') {
@@ -145,33 +146,38 @@ export default function mapPage({ libraries }: MapPageProps) {
     console.log(`위치: ${currentLocation}`);
   }, [setCurrentLocation])
 
-/* 사용자 위치 주소정보 서치
-  const getAddressFromCoordinates = async (latitude, longitude) => {
-    const clientId = 'YOUR_NAVER_CLIENT_ID';
-    const clientSecret = 'YOUR_NAVER_CLIENT_SECRET';
-    const response = await axios.get(
-      `https://naveropenapi.apigw.ntruss.com/map-reversegeocode/v2/gc?coords=${longitude},${latitude}&orders=roadaddr,addr&output=json`,
-      {
-        headers: {
-          'X-NCP-APIGW-API-KEY-ID': clientId,
-          'X-NCP-APIGW-API-KEY': clientSecret,
-        },
-      }
-    );
-    const { results } = response.data;
-    const address = results[0].region.area1.name + ' ' +
-                    results[0].region.area2.name + ' ' +
-                    results[0].region.area3.name + ' ' +
-                    results[0].region.area4.name;
-    setAddress(address);
-  };*/
 
+  const markerPress = (key: string) => {
+  // event 객체를 사용하여 마커의 위치 등의 정보에 접근할 수 있습니다.
+  // 선택된 마커의 정보를 상태에 업데이트합니다.
+  console.log('확인');
+  const data = libraries.find((library) => library.libCode === key);
+  setSelectedLibrary(data);
+  console.log(selectedLibrary)
+};
+
+  const handleSearch = () => {
+
+  }
   return (
     <View
       style={{
         flex: 1,
       }}
     >
+      {<View style={{flexDirection: 'row', margin: 10}}>
+        <TextInput
+          style={{ flex: 1,
+            borderColor: '#ccc',
+            borderWidth: 1,
+            marginRight: 10,
+            padding: 8,}}
+          value={search}
+          onChangeText={setSearch}
+          placeholder="도서관 이름을 입력하세요"
+        />
+        <Button title="검색" onPress={handleSearch} />
+      </View>}
       <NaverMapView
         camera={currentLocation}
         // initialCamera={jejuCamera}
@@ -203,38 +209,62 @@ export default function mapPage({ libraries }: MapPageProps) {
         // onCameraChanged={(args) =>
         //   console.log(`Camera Changed: ${formatJson(args)}`)
         // }
-        onTapMap={(args) => console.log(`Map Tapped: ${formatJson(args)}`)}
+        onTapMap={(args) => {setSelectedLibrary(null)}}
       >
-        {libraries.map((library) =>{
+        {libdata.map((library) =>{
           return (
-            <>
-        
-        <NaverMapMarkerOverlay
-          latitude={library.latitude}
-          longitude={library.longitude}
-          onTap={() => console.log(1)}
-          anchor={{ x: 0.5, y: 1 }}
-          width={25}
-          height={30}
-          key={library.libCode}
-          image={require('./image/marker_icon.png')}
-        >
-        </NaverMapMarkerOverlay>
-        
-      </>
+            <NaverMapMarkerOverlay
+              latitude={library.latitude}
+              longitude={library.longitude}
+              onTap={() => markerPress(library.libCode)}
+              anchor={{ x: 0.5, y: 1 }}
+              width={25}
+              height={30}
+              image={require('./image/marker_icon.png')}
+              caption={{text: library.libName, textSize: 12}}
+            />
           )
         })}
-        <NaverMapMarkerOverlay
-          latitude={currentLocation.latitude}
-          longitude={currentLocation.longitude}
-          onTap={() => console.log(1)}
-          anchor={{ x: 0.5, y: 1 }}
-          width={25}
-          height={30}
-          image={require('./image/marker_icon.png')}
-        >
-        </NaverMapMarkerOverlay>
+        
       </NaverMapView>
+          {/* 선택된 도서관 정보를 표시합니다. */}
+    {selectedLibrary && (
+      <View style={{backgroundColor: 'white', height: 200}}>
+        <View style = {{alignItems: 'center', marginBottom: 20}}>
+          <Text style = {{fontSize: 30,}}>{selectedLibrary.libName}</Text>
+        </View>
+        <View style = {{marginLeft:10, marginBottom: 5}}>
+          <Text>전화번호: {selectedLibrary.tel}</Text>
+        </View>
+        <View style = {{marginLeft:10, marginBottom: 5}}>
+          <Text>오픈시간: {selectedLibrary.operatingTime}</Text>
+        </View>
+        <View style = {{marginLeft:10, marginBottom: 5}}>
+          <Text>휴관일: {selectedLibrary.closed}</Text>
+        </View>
+        <View style = {{marginLeft:10, marginBottom: 5}}>
+          <Text>주소: {selectedLibrary.address}</Text>
+        </View>
+        {/* 선택된 도서관의 다른 정보도 표시할 수 있습니다. */}
+      </View>
+    )}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  markerContainer: {
+    position: 'absolute',
+    alignItems: 'center',
+  },
+  markerTextContainer: {
+    backgroundColor: 'white',
+    padding: 2,
+    borderRadius: 5,
+    marginTop: -5,
+  },
+  markerText: {
+    fontSize: 12,
+    color: 'black',
+  },
+});

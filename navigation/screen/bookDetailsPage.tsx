@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Button, Text, Image, TouchableOpacity, ScrollView, ActivityIndicator, Dimensions, FlatList } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import { View, StyleSheet, Button, Text, Image, TouchableOpacity, ScrollView, ActivityIndicator, Dimensions, FlatList, TextInput } from 'react-native';
+import { useRoute, useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 
 const screenWidth = Dimensions.get('window').width;
@@ -13,6 +13,11 @@ export default function() {
     const [loading, setLoading] = useState(true); // 로딩 상태 추가
     const [showView, setShowView] = useState(false);
     const [showLibrarys, setShowLibrarys] = useState(false);
+    const [libdata, setlibdata] = useState([]);
+    const [search, setSearch] = useState('')
+    const authKey = '3893e049e54f909aaaf758d6feda80d62f0619816c3d4ab05a76826ae6dbb046';
+    const navigation = useNavigation();
+
     useEffect(() => {
         if (route.params?.id) {
             setBookid(route.params.id);
@@ -21,7 +26,7 @@ export default function() {
     }, [route.params?.id]);
 
     const setDetails = async (id) => {
-        const authKey = '3893e049e54f909aaaf758d6feda80d62f0619816c3d4ab05a76826ae6dbb046';
+        
         const url = `http://data4library.kr/api/srchDtlList?authKey=${authKey}&isbn13=${id}&loaninfoYN=Y&format=json`;
 
         try {
@@ -48,10 +53,32 @@ export default function() {
         }
     };
 
+    const setLibList = async () => {
+        const url = ``//연결 코드 추가
+/*
+        try {
+            const response = await axios.get(url);
+            const obj = response.data;
+            if (obj.response && obj.response.detail) {
+                const newData =
+                setlibdata(newData)
+            }
+        } catch (error) {
+            console.error(`Error: ${error}`);
+        }
+
+        
+        */
+        
+    }
+    const libMap = () => {
+        navigation.navigate('libsel', {data: library});
+    }
     const toggle = () => {
         setShowView(!showView);
     };
     const librarys = () => {
+        setLibList()
         setShowLibrarys(!showLibrarys);
     };
 
@@ -95,6 +122,15 @@ export default function() {
             borderLeftColor: 'black',
             height: 20,
         },
+        listItem: {
+            borderWidth: 1,
+            borderLeftColor: 'black',
+        },
+        list: {
+            borderWidth: 1,
+            borderLeftColor: 'black',
+            flex: 1
+        }
     });
 
     if (loading) {
@@ -112,13 +148,15 @@ export default function() {
             tel: '010-2345-6789',
             closed: '휴관일',
             operatingTime: '운영시간',
-            address: '주소'
+            address: '주소',
+            latitude: 37.498040483,
+            longitude: 127.02758183
         }
-    ]
+    ];
 
     const renderItem = ({item}: {item: bookId}) => (
-        <TouchableOpacity >
-            <View>
+        <TouchableOpacity style = {{margin: 10}}>
+            <View style = {styles.listItem}>
                 <Text>{item.libName}</Text>
                 <Text>{item.closed} {item.operatingTime}</Text>
                 <Text>{item.address}</Text>
@@ -139,15 +177,26 @@ export default function() {
                     <Button title='뒤로가기' onPress={toggle} />
                 </View>
             ) : showLibrarys ? (
-                <View>
-                    <View >
-                        <Button title='뒤로가기' onPress={librarys} />
-                        <Button title='지도에서 찾기' />
+                <View style = {{flex: 1}}>
+                    <View style = {{flexDirection: 'row', margin: 10, height: 45}}>
+                        <TextInput
+                            style={{ flex: 1,
+                                borderColor: '#ccc',
+                                borderWidth: 1,
+                                marginRight: 10,
+                                padding: 8,}}
+                            value={search}
+                            onChangeText={setSearch}
+                            placeholder="주소를 입력하세요"
+                        />
+                        <Button title='뒤로' onPress={librarys}/>
+                        <Button title='지도' onPress={libMap}/>
                     </View>
                     <FlatList
                         data={library}
                         renderItem={renderItem}
                         keyExtractor={(item) => item.libCode}
+                        style = {styles.list}
                     />
                 </View>
             ) : (

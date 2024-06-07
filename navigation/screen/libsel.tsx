@@ -8,7 +8,12 @@ import MapPage from "./mapPage";
 export default function App() {
     const route = useRoute();
 
-    
+    try {
+        console.log("data: "+route.params.data);
+    } catch (error) {
+        console.log ("data error: " + error);
+    }
+    console.log('확인')
 
     return (
         <View style={{ flex: 1 }}>

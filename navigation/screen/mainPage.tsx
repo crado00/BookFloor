@@ -25,6 +25,7 @@ export default function(){
     var list = '';
     var bookRank;
     var bookSuggestion;
+    var libbookRank;
 
     
     bookSuggestion = [
@@ -42,13 +43,31 @@ export default function(){
             img: 'https://gongu.copyright.or.kr/gongu/wrt/cmmn/wrtFileImageView.do?wrtSn=9046601&filePath=L2Rpc2sxL25ld2RhdGEvMjAxNC8yMS9DTFM2L2FzYWRhbFBob3RvXzI0MTRfMjAxNDA0MTY=&thumbAt=Y&thumbSe=b_tbumb&wrtTy=10004',
         },
     ]
-
+    libbookRank = [
+        {
+            bookId: 'b1',
+            bookName: '확인용',
+            img: 'https://gongu.copyright.or.kr/gongu/wrt/cmmn/wrtFileImageView.do?wrtSn=9046601&filePath=L2Rpc2sxL25ld2RhdGEvMjAxNC8yMS9DTFM2L2FzYWRhbFBob3RvXzI0MTRfMjAxNDA0MTY=&thumbAt=Y&thumbSe=b_tbumb&wrtTy=10004',
+        },
+    ]
     const searchWordChange = (input: string) => {
         setSearchWord(input);
     }
 /*
     useEffect(() => {
-        fetch('내용 필요', {
+        const url = ``//url필요
+        
+        try {//사용할 예정
+            const response = await axios.get(url);
+            const obj = response.data;
+            if (obj.response && obj.response.detail) {
+                const newData = //답변 저장
+            }
+        } catch (errer) {
+             console.error(`Error: ${error}`);
+        }
+
+        fetch('내용 필요', {//한번에 값을 가져올 수 있다는 가정하에 만든 요청 제거 예정
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -61,6 +80,7 @@ export default function(){
                 list = JSON.stringify(responseJson.data);
                 bookRank = JSON.parse(list)//각각의 정보를 저장해야함
                 bookSuggestion = JSON.parse(list)//각각의 정보를 저장해야함
+                libbookRank = JSON.parse(list)//각각의 정보를 저장해야함
             }
         })
         .catch((error) => {
@@ -141,6 +161,15 @@ export default function(){
                 style = {{flexDirection: 'row'}}
             />
         </View>
+        <Text style = {{marginTop: 30}}>이용 도서관 추천도서</Text>
+        <View style = {styles.ScrollView}>
+            <FlatList
+                data = {libbookRank}
+                renderItem={renderItem}
+                keyExtractor={(item) => item.bookId}
+                style = {{flexDirection: 'row'}}
+            />
+        </View>
         <Text style = {{marginTop: 30}}>사용자 맞춤 추천 도서</Text>
         <View style = {styles.ScrollView}>
             <FlatList
@@ -150,5 +179,6 @@ export default function(){
                 style = {{flexDirection: 'row'}}
             />
         </View>
+        
     </View>);
 }
