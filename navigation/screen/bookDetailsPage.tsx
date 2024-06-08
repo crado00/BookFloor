@@ -19,7 +19,7 @@ export default function() {
     const navigation = useNavigation();
 
     useEffect(() => {
-        if (route.params?.id) {
+        if (route.params?.id) { 
             setBookid(route.params.id);
             setDetails(route.params.id);
         }
@@ -187,7 +187,7 @@ export default function() {
                                 padding: 8,}}
                             value={search}
                             onChangeText={setSearch}
-                            placeholder="주소를 입력하세요"
+                            placeholder="도서관 이름을 입력하세요"
                         />
                         <Button title='뒤로' onPress={librarys}/>
                         <Button title='지도' onPress={libMap}/>
