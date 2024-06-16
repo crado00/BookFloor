@@ -166,6 +166,7 @@ export default function App() {
           </View>
           <View style={styles.buttonContainer}>
             <View style={{ borderWidth: 2, borderColor: 'gray', width: 300, height: 200, padding: 7 }}>
+              
               <Text style={{ flex: 1 }}>{ocrText}</Text>
             </View>
             <Button title="되돌리기" onPress={cancel} />

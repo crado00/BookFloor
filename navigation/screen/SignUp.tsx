@@ -127,7 +127,7 @@ const SignUp = ({}) => {
       const responseJson = await response.json();
       if (response.ok) {
         ToastAndroid.show('회원가입 성공!', ToastAndroid.SHORT);
-        navigation.navigate('SignIn');
+        navigation.navigate('profileMake', {id: id, name: name});
       } else {
         ToastAndroid.show(responseJson.message, ToastAndroid.SHORT);
       }

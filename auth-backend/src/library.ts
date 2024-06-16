@@ -112,7 +112,7 @@ router.get('/find', async (req, res) =>{
 })
 
 router.get('/popular-book/:libraryCode', async (req, res) =>{
-    console.log("특정 도서관 검색")
+    console.log("사용자 도서관 추천 검색")
     const { libraryCode } = req.params;
     console.log("확인")
     if(!libraryCode) {

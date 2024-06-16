@@ -25,26 +25,39 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.post('/update-profile', upload.single('profileImage'), async (req, res) => {
-  const { name, userId, imageUri } = req.body;
-
+  console.log('확인')
+  const { name, userId, libCode } = req.body;
+  console.log("값: " + name+"/"+"/"+userId+"/"+libCode)
   try {
+    
     const user = await User.findOne({ where: { username: userId } });
 
     if (!user) {
       return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' });
     }
+    if (req.file) {
+      // req.file이 존재할 때만 imageUri를 업데이트
+      user.profileImage = req.file.filename;
+    }
+    if(!name){
+      user.name = name || user.name;
+    }
 
-    user.name = name || user.name;
-
-    user.profileImage = imageUri;
+    if(!libCode){
+      user.libCode = libCode;
+    }
 
     await user.save();
-    console.log(user.profileImage);
-    res.status(200).json({ message: '프로필이 성공적으로 업데이트되었습니다.' });
+    console.log(user.profileImage); 
+    res.json({username: user.name, libCode: user.libCode, imageurl: user.profileImage})
   } catch (error) {
     res.status(500).json({ message: '프로필 업데이트 중에 에러가 발생했습니다.', error });
   }
 });
+
+router.post("/post-profile", async (req, res) =>{
+
+})
 
 router.post('/check-username', async (req, res) => {
   const { username } = req.body;
@@ -95,7 +108,7 @@ router.post('/login', async (req, res) => {
     const token = jwt.sign({ id: user.id }, SECRET_KEY, {
       expiresIn: '1h',
     });
-    res.json({ token, userId: user.id, username: user.name, profileImage: user.profileImage });
+    res.json({ token, userId: user.id, username: user.name, profileImage: user.profileImage, libCode: user.libCode });
   } catch (error) {
     res.status(500).json({ message: '로그인 중에 에러가 발생했습니다.', error });
   }

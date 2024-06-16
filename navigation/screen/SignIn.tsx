@@ -42,9 +42,12 @@ function SignIn(): React.JSX.Element {
       });
       const responseJson = await response.json();
       if (response.ok) {
-        await storeUserData(responseJson.token, id);
-        navigation.navigate('pageGruep');
-        
+        await storeUserData(responseJson.token, id, responseJson.username, responseJson.profileImage, responseJson.libCode);
+
+        navigation.reset({
+          index:0,
+          routes: [{name: 'pageGruep'}]
+        })
       } else {
         Alert.alert('로그인 실패', responseJson.message);
       }
@@ -130,7 +133,7 @@ function SignIn(): React.JSX.Element {
           <Text style={styles.texts}>비밀번호</Text>
         </View>
         <View style={styles.textInputsContainer}>
-          <TextInput placeholder="비밀번호를 입력하세요." onChangeText={setPw} style={styles.pwInputs} value={pw}></TextInput>
+          <TextInput placeholder="비밀번호를 입력하세요." onChangeText={setPw} style={styles.pwInputs} value={pw} secureTextEntry={true}></TextInput>
         </View>
       </View>
 

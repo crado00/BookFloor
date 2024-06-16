@@ -159,8 +159,11 @@ export default function mapPage() {
   
 };
 const setlib = () => {
-  navigation.setParams({libcode: selectedLibrary.libCode});
-  navigation.goBack()
+  console.log(selectedLibrary.libCode)
+  navigation.reset({
+    index:0,
+    routes: [{name: 'profileMake', params: { libcode: selectedLibrary.libCode }}]
+  })
 }
 
   const handleSearch = async () => {

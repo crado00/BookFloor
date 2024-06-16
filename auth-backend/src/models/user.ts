@@ -10,6 +10,7 @@ class User extends Model {
   public birth_date!: Date;
   public gender!: string;
   public profileImage!: string;
+  public libCode!: Number;
 }
 
 User.init(
@@ -47,6 +48,10 @@ User.init(
       type: new DataTypes.STRING(128),
       allowNull: true,
     },
+    libCode: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: true,
+    }
   },
   {
     sequelize,

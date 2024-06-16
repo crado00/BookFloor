@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Button, Text , Image, TouchableOpacity, TextInput, Dimensions, ToastAndroid} from 'react-native';
-import { retrieveUserData } from './rogin/auth'
+import { retrieveUserData, updateUserData } from './rogin/auth'
 import { FlatList } from 'react-native-gesture-handler';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -12,7 +12,6 @@ import {
     requestMultiple,
   } from 'react-native-permissions';
 import axios from 'axios';
-
 interface library{
     libCode: string,
     libName: string,
@@ -30,7 +29,7 @@ export default function profileChange(){
     const screenWidth = Dimensions.get('window').width;
     const [imageUri, setImageUri] = useState<string>();
     const [searchlib, setSearchlib] = useState<string>();
-    const [lib, setlib] = useState({});
+    const [id, setId] = useState({});
     const [libraryData, setLibraryData] =useState([]);
     const [chack, setChack] = useState('');//라이브러리 코드가 저장됨
 
@@ -39,7 +38,8 @@ export default function profileChange(){
       useEffect(() => {
         const fetchData = async () => {
           const data = await retrieveUserData();
-          setName(data.userId);
+          setId(data.userId)
+          setName(data.username);
         };
     
         fetchData();
@@ -109,18 +109,39 @@ export default function profileChange(){
     useEffect(() => {
       console.log("내용확인")
 
-      if (route.params?.update) {
-        console.log(route.params.update+"확인")
-        setChack(route.params.update.libcode)
+      if (route.params?.libcode) {
+        setChack(route.params.libcode)
       }
-    }, [route.params?.update]);
+    }, [route.params?.libcode]);
 
-    const btn = () => {
-        
+    const btn = async () => {
+        const url = `http://10.0.2.2:3001/api/update-profile`
+        const formData = new FormData();
+        formData.append('profileImage', {
+          uri: imageUri,
+          type: 'image/jpeg', // 또는 다른 이미지 유형
+          name: 'image.jpg', // 파일 이름
+        });
+        formData.append('name', name);
+        formData.append('userId', id);
+        formData.append('libCode', chack);
+        try {
+          const response = await axios.post(url, formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          })
+          updateUserData({username: response.data.name})
+          updateUserData({libCode: response.data.libCode})
+          updateUserData({profileImage: response.data.imageurl})
+          navigation.goBack()
+        } catch (error) {
+          console.log(error)
+        }
     }
 
     const libsearch = async () => {
-      const url = `http://10.0.2.2:3001/search`
+      const url = `http://10.0.2.2:3001/library/search`
         console.log(searchlib !== '')
 
             if(searchlib !== ''){                
@@ -173,6 +194,7 @@ export default function profileChange(){
             console.log('ImagePicker Error: ', response.errorMessage);
           } else if (response.assets && response.assets.length > 0) {
             const uri = response.assets[0].uri || ''; // undefined인 경우 빈 문자열로 대체
+            console.log(uri)
             setImageUri(uri);
           }
         });
@@ -207,13 +229,13 @@ export default function profileChange(){
             </TouchableOpacity>
             <View style = {{flexDirection: "row"}}>
                 <View style = {{flex: 1, flexDirection: "row", justifyContent: 'space-between', marginLeft: 20, marginRight: 20}}>
-                    <Text>닉네임을 입력해주세요</Text>
+                    <Text>이름을 입력해주세요</Text>
                     <Text>0/20</Text>
                 </View>
             </View>
             <View style = {{flexDirection: "row"}}>
                 <View style = {{flex:1, marginLeft:20, marginRight: 20,borderWidth: 2,borderColor: 'black',}}>
-                    <TextInput placeholder = {name}/>
+                    <TextInput placeholder = 'user name' value={name} onChangeText={setName}/>
                 </View>
             </View>
             

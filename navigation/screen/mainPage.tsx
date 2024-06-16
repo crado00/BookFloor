@@ -39,12 +39,15 @@ export default function(){
     }
     useEffect(() =>{
         const currentDate = new Date();
-        const oneWeekAgo = new Date(currentDate);
-        oneWeekAgo.setDate(oneWeekAgo.getDate() - 8);
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
         const year = oneWeekAgo.getFullYear()
-        const month = oneWeekAgo.getMonth()
-        const date = oneWeekAgo.getDay()
-        const url = `http://data4library.kr/api/loanItemSrch?authKey=${key}&startDt=${year}-${month}-${date}&format=json`
+        const month = (oneWeekAgo.getMonth() + 1).toString().padStart(2, '0');
+        const date = (oneWeekAgo.getDate()).toString().padStart(2, '0');
+
+        
+        const url = `https://data4library.kr/api/loanItemSrch?authKey=${key}&startDt=${year}-${month}-${date}&pageSize=10&format=json`
+        console.log(`url 날짜 확인: ${url}`);
 
         const libbookData = async () => {
             try {
@@ -70,13 +73,10 @@ export default function(){
     },[])
 
     useEffect(() =>{
-        console.log('1')
         const url = `http://10.0.2.2:3001/library/popular-book/144177`
         const libbookData = async () => {
-            console.log('2')
             try {
                 const response = await axios.get(url)
-        console.log('3')
 
                 const obj = response.data;
                 const booksArray=[]
@@ -88,8 +88,6 @@ export default function(){
                     img: book.bookImageURL
                    })
                 });
-                console.log("확인용")
-                console.log(booksArray)
                 setlibbookRank(booksArray)
             } catch (error) {
                 console.log("도서관 추천 에러: " + error)
@@ -97,41 +95,7 @@ export default function(){
         }
         libbookData()
     },[setlibbookRank])
-/*
-    useEffect(() => {
-        const url = ``//url필요
-        
-        try {//사용할 예정
-            const response = await axios.get(url);
-            const obj = response.data;
-            if (obj.response && obj.response.detail) {
-                const newData = //답변 저장
-            }
-        } catch (errer) {
-             console.error(`Error: ${error}`);
-        }
 
-        fetch('내용 필요', {//한번에 값을 가져올 수 있다는 가정하에 만든 요청 제거 예정
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(userData),
-        }).then((response) => response.json())
-        .then((responseJson) => {
-            console.log(responseJson);
-            if (responseJson.status === 'success') {// 변경 필요 토큰을 가져와야함
-                list = JSON.stringify(responseJson.data);
-                bookRank = JSON.parse(list)//각각의 정보를 저장해야함
-                bookSuggestion = JSON.parse(list)//각각의 정보를 저장해야함
-                libbookRank = JSON.parse(list)//각각의 정보를 저장해야함
-            }
-        })
-        .catch((error) => {
-            console.error(error);
-        });
-    }, []);
-*/
     const typing = () =>{
 
         navigation.navigate('searchPage', {search: searchWord});

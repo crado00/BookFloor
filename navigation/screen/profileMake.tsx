@@ -1,7 +1,7 @@
 import React, { useState , useEffect } from 'react';
 import { View, StyleSheet, Button, Text , Image, TouchableOpacity, FlatList, Dimensions, ToastAndroid } from 'react-native';
 import { ScrollView, TextInput } from 'react-native-gesture-handler';
-import { storeUserData, retrieveUserData } from './rogin/auth'
+import { updateUserData, retrieveUserData} from './rogin/auth'
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import Geolocation from "react-native-geolocation-service"
@@ -153,18 +153,18 @@ export default function() {
     useEffect(() => {
         console.log("내용확인")
   
-        if (route.params?.update) {
-          console.log(route.params.update+"확인")
-          setChack(route.params.update.libcode)
+        if (route.params?.libcode) {
+          setChack(route.params.libcode)
         }
-      }, [route.params?.update]);
+      }, [route.params?.libcode]);
+
+      
     const setlib = async (lat: number, long: number) =>{
     const url = `http://10.0.2.2:3001/library/libraries/${lat}/${long}/0.05/0.05`//연결 코드 추가
-        console.log(url)
+
       try{
       const response = await axios.get(url)
       const obj = response.data
-        console.log(obj)
       if(obj){
           const newData = obj.map((item) => {
             const setlat = Number(item.LATITUDE);
@@ -181,14 +181,14 @@ export default function() {
               }
           })
           setLibraryData(newData)
-          console.log(newData)
+          navigation.navigate('SignIn');
       }
       }catch(e){
           console.log(e)
       }
     }
     const backbtn = () => {
-        navigation.goBack();
+        navigation.goBack()
     }
     
     const imgChange = () => {
@@ -207,9 +207,28 @@ export default function() {
       };
 
       
-    const complete = () => {
-        // 저장 부분
+    const complete = async () => {
+        const url = `http://10.0.2.2:3001/api/update-profile`
+        const formData = new FormData();
+        formData.append('profileImage', {
+          uri: imageUri,
+          type: 'image/jpeg', // 또는 다른 이미지 유형
+          name: 'image.jpg', // 파일 이름
+        });
+        formData.append('name', route.params?.name);
+        formData.append('userId', route.params?.id);
+        formData.append('libCode', chack);
+        try {
+          const response = await axios.post(url, formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          })
         navigation.navigate('pageGruep');
+        } catch (error) {
+          console.log(error)
+        }
+        // 저장 부분
     }
     const maplib = () => {
         navigation.navigate('mapPage', {data: libraryData});

@@ -9,11 +9,13 @@ import axios from 'axios';
 const MyPage = () =>{
 
   const [Name, setName] = useState<string>('유저이름');
+  const [imgUrl, setImgUrl] =useState<string>();
 
   useEffect(() => {
     const fetchData = async () => {
       const data = await retrieveUserData();
-      setName(data.userId);
+      setImgUrl(`http://10.0.2.2:3001/uploads/${data.profileImage}`)
+      setName(data.username);
     };
 
     fetchData();
@@ -54,7 +56,7 @@ const MyPage = () =>{
         <View style = {styles.circle}>
           <Image 
           style = {styles.image}
-          source={ { uri: 'https://gongu.copyright.or.kr/gongu/wrt/cmmn/wrtFileImageView.do?wrtSn=9046601&filePath=L2Rpc2sxL25ld2RhdGEvMjAxNC8yMS9DTFM2L2FzYWRhbFBob3RvXzI0MTRfMjAxNDA0MTY=&thumbAt=Y&thumbSe=b_tbumb&wrtTy=10004' } }
+          source={ { uri: imgUrl } }
           />
         </View>
         <View style = {styles.profile2}>
