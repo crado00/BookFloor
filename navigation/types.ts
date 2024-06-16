@@ -11,5 +11,6 @@ export declare module CommonType {
         profileMake: undefined;
         myStudy: undefined;
         libsel: undefined;
+        ocrBookResult: undefined;
     };
 }
