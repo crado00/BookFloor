@@ -3,6 +3,8 @@ import { View, StyleSheet, Button, Text , Image, TouchableOpacity} from 'react-n
 import TabViewExample from './myPageTab/tabNavigation';
 import { useNavigation  } from '@react-navigation/native';
 import { retrieveUserData } from './rogin/auth'
+import MyStudy from './myStudy';
+import axios from 'axios';
 
 const MyPage = () =>{
 
@@ -25,6 +27,26 @@ const MyPage = () =>{
   const myStudy = () =>{
     navigation.navigate('myStudy')
   }
+
+  const handleLogout = async () => {
+    try {
+      await axios.post('http://10.0.2.2:3001/api/logout');
+      navigation.navigate('SignIn');
+    } catch (error) {
+      console.error('Logout failed', error);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      await axios.post('http://10.0.2.2:3001/api/delete-account', {
+        username: Name,
+      });
+      navigation.navigate('SignIn');
+    } catch (error) {
+      console.error('Account deletion failed', error);
+    }
+  };
     return(
     <View style = {styles.container}>
         <Text style = {styles.titles}>프로필</Text>
@@ -41,31 +63,17 @@ const MyPage = () =>{
           </View>
           <View style = {styles.profile3}>
               <Button title='프로필 변경'onPress={pfcp}/>
-              <Button title='내 서재' onPress={myStudy}/>
           </View>
         </View>
         
       </View>
-      <View style = {styles.viewGrup}>
-      <View style={[styles.divider]} />
-        <View style = {styles.textView}>
-          <Text style = {styles.text}>게시글/댓글</Text>
-          <Text style = {styles.text}>수넣을자리</Text>
-        </View>
-        <View style={[styles.divider]} />
-        <View style = {styles.textView}>
-          <Text style = {styles.text}>받은 공감</Text>
-          <Text style = {styles.text}>수넣을자리</Text>
-        </View>
-        <View style={[styles.divider]} />
-        <View style = {styles.textView}>
-          <Text style = {styles.text}>내 서재</Text>
-          <Text style = {styles.text}>수넣을자리</Text>
-        </View>
-        <View style={[styles.divider]} />
-      </View>
+      
       <View style = {{height: 10 ,backgroundColor: 'white_gray'}}/>
-      <TabViewExample/>
+      <MyStudy/>
+      <View style={styles.buttonContainer}>
+        <Button title="로그아웃" onPress={handleLogout} />
+        <Button title="회원탈퇴" onPress={handleDeleteAccount} />
+      </View>
     </View>
     );
 }
@@ -135,7 +143,12 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       marginLeft: 20,
       marginRight: 20
-    }
+    },
+    buttonContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      marginTop: 20,
+    },
     
   });
 

@@ -14,7 +14,7 @@ import {
   requestLocationAccuracy,
   requestMultiple,
 } from 'react-native-permissions';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { formatJson, generateArray } from '@mj-studio/js-util';
 import Geolocation from "react-native-geolocation-service"
 import axios from 'axios';
 // const jejuRegion: Region = {projectName\navigation\component\components.tsx
@@ -78,8 +78,7 @@ type Location = {
 
 export default function mapPage() {
   const ref = useRef<NaverMapViewRef>(null);
-  const navigation = useNavigation()
-  const route = useRoute()
+
   const [camera, setCamera] = useState(Cameras.Seolleung);
 
   const [nightMode, setNightMode] = useState(false);
@@ -92,7 +91,7 @@ export default function mapPage() {
   const [indoorLevelPicker, setIndoorLevelPicker] = useState(true);
   const [myLocation, setMyLocation] = useState(true);
   const [currentLocation, setCurrentLocation] = useState<Location>({latitude:0, longitude:0, zoom: 14})
-  const [libdata, setlibdata] = useState(route.params?.data)
+  const [libdata, setlibdata] = useState([])
 
   const [search, setSearch] =useState("")
   
@@ -132,6 +131,7 @@ export default function mapPage() {
     const location = () => Geolocation.getCurrentPosition(
       (positon) =>{
         const {latitude, longitude} = positon.coords
+        setlib(latitude, longitude);
         setCurrentLocation({ latitude: latitude, longitude: longitude, zoom: 12 })
       },
       (error) => {
@@ -145,9 +145,37 @@ export default function mapPage() {
       }
     )
     location()
-    console.log(`위치: ${currentLocation}`);
+    console.log(`${currentLocation}`);
   }, [setCurrentLocation])
 
+  const setlib = async (lat: number, long: number) =>{
+    const url = `http://10.0.2.2:3000/library/libraries/${lat}/${long}/0.05/0.05`//연결 코드 추가
+  
+        console.log('전송시작')
+      try{
+      const response = await axios.get(url)
+      const obj = response.data
+      if(obj){
+          const newData = obj.map((item) => {
+            const setlat = Number(item.LATITUDE);
+            const setlong = Number(item.LONGITUDE);
+              return {
+                  libCode: item.LBRRY_CD,
+                  libName: item.LIBRARY_NAME,
+                  tel: item.LIBRARY_TEL,
+                  closed: item.LIBRARY_CLOSED,
+                  operatingTime: item.OPERATINGTIME,
+                  address: item.ADDRESS,
+                  latitude: setlat,
+                  longitude: setlong
+              }
+          })
+          setlibdata(newData)
+      }
+      }catch(e){
+          console.log(e)
+      }
+    }
 
   const markerPress = (key: string) => {
   // event 객체를 사용하여 마커의 위치 등의 정보에 접근할 수 있습니다.
@@ -156,16 +184,10 @@ export default function mapPage() {
   const data = libdata.find((library) => library.libCode === key);
   setSelectedLibrary(data);
   console.log(selectedLibrary)
-  
 };
-const setlib = () => {
-  navigation.setParams({libcode: selectedLibrary.libCode});
-  navigation.goBack()
-}
 
   const handleSearch = async () => {
-    const url = `http://10.0.2.2:3000/search`
-        console.log(search !== '')
+    const url = `http://10.0.2.2:3001/library/search`
 
             if(search !== ''){                
                 try{
@@ -173,9 +195,7 @@ const setlib = () => {
                     const response = await axios.post(url,
                         {
                             name: search,
-                            filters: {
-                                date: '2024-06-14'
-                            }
+                            
                         }
                     )
                     const obj = response.data;
@@ -293,7 +313,6 @@ const setlib = () => {
         <View style = {{marginLeft:10, marginBottom: 5}}>
           <Text>주소: {selectedLibrary.address}</Text>
         </View>
-        <Button title='선택' onPress={setlib}/>
         {/* 선택된 도서관의 다른 정보도 표시할 수 있습니다. */}
       </View>
     )}

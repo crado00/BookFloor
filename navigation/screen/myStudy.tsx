@@ -1,11 +1,8 @@
 import React, { useState, useEffect }  from "react";
-import { View, Image, StyleSheet, FlatList, TouchableOpacity, Text, Dimensions, Modal, Button, ToastAndroid } from "react-native";
+import { View, Image, StyleSheet, FlatList, TouchableOpacity, Text, Modal, Button, ToastAndroid } from "react-native";
 import axios from 'axios';
 import { TextInput } from "react-native-gesture-handler";
 import { searchCode } from "./search/searchCode"
-
-const screenWidth = Dimensions.get('window').width;
-const screenHeight = Dimensions.get('window').height;
 
 interface books{
     bookId: string,
@@ -36,37 +33,7 @@ export default function(){
     const [pullBookId,setPullBookId] = useState('')
     const [pullBookImg, setPullBookImg] = useState('https://gongu.copyright.or.kr/gongu/wrt/cmmn/wrtFileImageView.do?wrtSn=9046601&filePath=L2Rpc2sxL25ld2RhdGEvMjAxNC8yMS9DTFM2L2FzYWRhbFBob3RvXzI0MTRfMjAxNDA0MTY=&thumbAt=Y&thumbSe=b_tbumb&wrtTy=10004')
 
-    const [books, setBooks] = useState([
-        {
-            bookId: '1',
-            bookName: '확인용',
-            img: 'https://gongu.copyright.or.kr/gongu/wrt/cmmn/wrtFileImageView.do?wrtSn=9046601&filePath=L2Rpc2sxL25ld2RhdGEvMjAxNC8yMS9DTFM2L2FzYWRhbFBob3RvXzI0MTRfMjAxNDA0MTY=&thumbAt=Y&thumbSe=b_tbumb&wrtTy=10004',
-            review: '확인용 내용임'
-        },
-        {
-            bookId: '2',
-            bookName: '확인용',
-            img: 'https://gongu.copyright.or.kr/gongu/wrt/cmmn/wrtFileImageView.do?wrtSn=9046601&filePath=L2Rpc2sxL25ld2RhdGEvMjAxNC8yMS9DTFM2L2FzYWRhbFBob3RvXzI0MTRfMjAxNDA0MTY=&thumbAt=Y&thumbSe=b_tbumb&wrtTy=10004',
-            review: '확인용 내용임'
-        },
-        {
-            bookId: '3',
-            bookName: '확인용',
-            img: 'https://gongu.copyright.or.kr/gongu/wrt/cmmn/wrtFileImageView.do?wrtSn=9046601&filePath=L2Rpc2sxL25ld2RhdGEvMjAxNC8yMS9DTFM2L2FzYWRhbFBob3RvXzI0MTRfMjAxNDA0MTY=&thumbAt=Y&thumbSe=b_tbumb&wrtTy=10004'
-        },
-        {
-            bookId: '4',
-            bookName: '확인용',
-            img: 'https://gongu.copyright.or.kr/gongu/wrt/cmmn/wrtFileImageView.do?wrtSn=9046601&filePath=L2Rpc2sxL25ld2RhdGEvMjAxNC8yMS9DTFM2L2FzYWRhbFBob3RvXzI0MTRfMjAxNDA0MTY=&thumbAt=Y&thumbSe=b_tbumb&wrtTy=10004',
-            review: '확인용 내용임'
-        },
-        {
-            bookId: '5',
-            bookName: '확인용',
-            img: 'https://gongu.copyright.or.kr/gongu/wrt/cmmn/wrtFileImageView.do?wrtSn=9046601&filePath=L2Rpc2sxL25ld2RhdGEvMjAxNC8yMS9DTFM2L2FzYWRhbFBob3RvXzI0MTRfMjAxNDA0MTY=&thumbAt=Y&thumbSe=b_tbumb&wrtTy=10004',
-            review: '확인용 내용임'
-        },
-    ])
+    const [books, setBooks] = useState([])
 
     const bookAdd = {
         bookId: '0',
@@ -201,10 +168,6 @@ export default function(){
     
     return (
         <View style = {styles.container}>
-            <View style = {{alignItems: 'center'}}>
-                <Text style = { {fontSize: 40,} }>내 서재</Text>
-            </View>
-            
             <FlatList
                 data={books}
                 renderItem={randerItem}

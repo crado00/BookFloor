@@ -11,7 +11,9 @@ import searchPage from './screen/searchPage';
 import bookDetailsPage from './screen/bookDetailsPage';
 import profileMake from './screen/profileMake';
 import myStudy from './screen/myStudy';
-import libsel from './screen/libsel';
+import libsel from './screen/libsel'
+import mapPage from './screen/mapPage';
+import booklibsel from './screen/booklibsel';
 
 const StackNavigation = () => {// 스택 내비게이션을 설정하는 컴포넌트
     
@@ -46,6 +48,8 @@ const StackNavigation = () => {// 스택 내비게이션을 설정하는 컴포�
                 <Stack.Screen name='profileMake' component={profileMake} options={{headerShown: false}}/>
                 <Stack.Screen name='myStudy' component={myStudy} />
                 <Stack.Screen name='libsel' component={libsel} />
+                <Stack.Screen name='booklibsel' component={booklibsel}/>
+                <Stack.Screen name='mapPage' component={mapPage}/>
             </Stack.Navigator>
         </NavigationContainer >
     )

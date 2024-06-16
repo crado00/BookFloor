@@ -2,6 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Button, Text, Image, TouchableOpacity, ScrollView, ActivityIndicator, Dimensions, FlatList, TextInput } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import axios from 'axios';
+import Geolocation from "react-native-geolocation-service"
+import {
+    request,
+    PERMISSIONS,
+    requestLocationAccuracy,
+    requestMultiple,
+  } from 'react-native-permissions';
 
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
@@ -19,7 +26,7 @@ export default function() {
     const navigation = useNavigation();
 
     useEffect(() => {
-        if (route.params?.id) { 
+        if (route.params?.id) {
             setBookid(route.params.id);
             setDetails(route.params.id);
         }
@@ -54,33 +61,90 @@ export default function() {
     };
 
     const setLibList = async () => {
-        const url = ``//연결 코드 추가
-/*
-        try {
-            const response = await axios.get(url);
-            const obj = response.data;
-            if (obj.response && obj.response.detail) {
-                const newData =
-                setlibdata(newData)
-            }
-        } catch (error) {
-            console.error(`Error: ${error}`);
-        }
-
         
-        */
+        requestMultiple([
+            PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
+            PERMISSIONS.ANDROID.ACCESS_BACKGROUND_LOCATION,
+          ])
+            .then((status) => {
+              console.log(`Location request status: ${status}`);
+            })
+            .catch((e) => {
+              console.error(`Location request has been failed: ${e}`);
+            });
+
+            const location = () => Geolocation.getCurrentPosition(
+                (positon) =>{
+                  const {latitude, longitude} = positon.coords
+                  setlib(latitude,longitude);
+                },
+                (error) => {
+                  console.log(error)
+                },
+                {
+                  enableHighAccuracy: true,
+                  timeout: 20000,
+                  maximumAge: 0,
+                  distanceFilter: 1
+                }
+              )
+              location()
         
     }
+
+    const setlib = async (lat: number, long: number) =>{
+        const url = `http://10.0.2.2:3001/library/find/`//연결 코드 추가
+    
+            console.log('전송시작')
+          try{
+          const response = await axios.get(url,
+            {
+                params: {
+                    latitude: lat,
+                    longitude: long,
+                    latitude_delta: 0.05,
+                    longitude_delta: 0.05,
+                    isbn13: bookid
+                }
+            }
+        )
+          const obj = response.data.flat()
+
+          if(obj){
+              const newData = obj.map((item) => {
+                const setlat = Number(item.LATITUDE);
+                const setlong = Number(item.LONGITUDE);
+                  return {
+                      libCode: item.LBRRY_CD,
+                      libName: item.LIBRARY_NAME,
+                      tel: item.LIBRARY_TEL,
+                      closed: item.LIBRARY_CLOSED,
+                      operatingTime: item.OPERATINGTIME,
+                      address: item.ADDRESS,
+                      latitude: setlat,
+                      longitude: setlong
+                  }
+              })
+              setlibdata(newData)
+              setShowLibrarys(!showLibrarys);
+          }
+          }catch(e){
+              console.log(e)
+          }
+        }
+
     const libMap = () => {
-        navigation.navigate('libsel', {data: library});
+        navigation.navigate('booklibsel', {data: libdata});
     }
     const toggle = () => {
         setShowView(!showView);
     };
     const librarys = () => {
         setLibList()
-        setShowLibrarys(!showLibrarys);
     };
+    const redata = () =>{
+        setShowLibrarys(!showLibrarys);
+    }
 
     const styles = StyleSheet.create({
         img: {
@@ -125,6 +189,7 @@ export default function() {
         listItem: {
             borderWidth: 1,
             borderLeftColor: 'black',
+            margin: 5,
         },
         list: {
             borderWidth: 1,
@@ -141,27 +206,15 @@ export default function() {
         );
     }
 
-    const library = [
-        {
-            libCode: '1',
-            libName: '도서관',
-            tel: '010-2345-6789',
-            closed: '휴관일',
-            operatingTime: '운영시간',
-            address: '주소',
-            latitude: 37.498040483,
-            longitude: 127.02758183
-        }
-    ];
+    
 
     const renderItem = ({item}: {item: bookId}) => (
-        <TouchableOpacity style = {{margin: 10}}>
             <View style = {styles.listItem}>
-                <Text>{item.libName}</Text>
-                <Text>{item.closed} {item.operatingTime}</Text>
-                <Text>{item.address}</Text>
+            <Text>{item.libName}</Text>
+                <Text numberOfLines={1} ellipsizeMode="tail" >휴관일: {item.closed}</Text>
+                <Text numberOfLines={1} ellipsizeMode="tail" >운영시간: {item.operatingTime}</Text>
+                <Text>주소: {item.address}</Text>
             </View>
-        </TouchableOpacity>
     )
     return (
         <View style={{ flex: 1, backgroundColor: 'white' }}>
@@ -178,26 +231,19 @@ export default function() {
                 </View>
             ) : showLibrarys ? (
                 <View style = {{flex: 1}}>
-                    <View style = {{flexDirection: 'row', margin: 10, height: 45}}>
-                        <TextInput
-                            style={{ flex: 1,
-                                borderColor: '#ccc',
-                                borderWidth: 1,
-                                marginRight: 10,
-                                padding: 8,}}
-                            value={search}
-                            onChangeText={setSearch}
-                            placeholder="도서관 이름을 입력하세요"
-                        />
-                        <Button title='뒤로' onPress={librarys}/>
-                        <Button title='지도' onPress={libMap}/>
+                    <View style = {{flexDirection: 'row', justifyContent: 'center', margin: 5, marginBottom: 10}}>
+                    <Text style = {{fontSize: 30}}>도서 소장 도서관 목록</Text>
                     </View>
                     <FlatList
-                        data={library}
+                        data={libdata}
                         renderItem={renderItem}
                         keyExtractor={(item) => item.libCode}
                         style = {styles.list}
                     />
+                    <View style = {{flexDirection: 'row', margin: 10, height: 45, justifyContent: 'space-evenly'}}>
+                        <Button title='뒤로' onPress={redata}/>
+                        <Button title='지도' onPress={libMap}/>
+                    </View>
                 </View>
             ) : (
                 <>

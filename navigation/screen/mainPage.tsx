@@ -18,14 +18,11 @@ interface bookRank{
 
 export default function(){
     const [searchWord, setSearchWord] = useState<string>('');
-
+    const [libbookRank, setlibbookRank] =useState([]);
+    const [bookRank, setbookRank] =useState([]);
     const navigation = useNavigation();
-
-
-    var list = '';
-    var bookRank;
+    const key = 'faf460c70f6b5b9163c4fb0b97d3cfc5ea649d7319099d1c7568b8d076a2131f'
     var bookSuggestion;
-    var libbookRank;
 
     
     bookSuggestion = [
@@ -33,26 +30,73 @@ export default function(){
             bookId: 'b1',
             bookName: '확인용',
             img: 'https://gongu.copyright.or.kr/gongu/wrt/cmmn/wrtFileImageView.do?wrtSn=9046601&filePath=L2Rpc2sxL25ld2RhdGEvMjAxNC8yMS9DTFM2L2FzYWRhbFBob3RvXzI0MTRfMjAxNDA0MTY=&thumbAt=Y&thumbSe=b_tbumb&wrtTy=10004',
-        }
+        },
     ]
     
-    bookRank = [
-        {
-            bookId: 'b1',
-            bookName: '확인용',
-            img: 'https://gongu.copyright.or.kr/gongu/wrt/cmmn/wrtFileImageView.do?wrtSn=9046601&filePath=L2Rpc2sxL25ld2RhdGEvMjAxNC8yMS9DTFM2L2FzYWRhbFBob3RvXzI0MTRfMjAxNDA0MTY=&thumbAt=Y&thumbSe=b_tbumb&wrtTy=10004',
-        },
-    ]
-    libbookRank = [
-        {
-            bookId: 'b1',
-            bookName: '확인용',
-            img: 'https://gongu.copyright.or.kr/gongu/wrt/cmmn/wrtFileImageView.do?wrtSn=9046601&filePath=L2Rpc2sxL25ld2RhdGEvMjAxNC8yMS9DTFM2L2FzYWRhbFBob3RvXzI0MTRfMjAxNDA0MTY=&thumbAt=Y&thumbSe=b_tbumb&wrtTy=10004',
-        },
-    ]
+    
     const searchWordChange = (input: string) => {
         setSearchWord(input);
     }
+    useEffect(() =>{
+        const currentDate = new Date();
+        const oneWeekAgo = new Date(currentDate);
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 8);
+        const year = oneWeekAgo.getFullYear()
+        const month = oneWeekAgo.getMonth()
+        const date = oneWeekAgo.getDay()
+        const url = `http://data4library.kr/api/loanItemSrch?authKey=${key}&startDt=${year}-${month}-${date}&format=json`
+
+        const libbookData = async () => {
+            try {
+                const response = await axios.get(url)
+                const obj = response.data;
+                const booksArray=[]
+                if (obj.response && obj.response.docs) {
+                    obj.response.docs.forEach((item) => {
+                        const book = item.doc;
+                        booksArray.push({
+                            bookId: book.isbn13,
+                            img: book.bookImageURL,
+                            bookName: book.bookname,
+                        });
+                    });
+                }
+                setbookRank(booksArray)
+            } catch (error) {
+                console.log("이번주 추천 에러: " + error)
+            }
+        }
+        libbookData()
+    },[])
+
+    useEffect(() =>{
+        console.log('1')
+        const url = `http://10.0.2.2:3001/library/popular-book/144177`
+        const libbookData = async () => {
+            console.log('2')
+            try {
+                const response = await axios.get(url)
+        console.log('3')
+
+                const obj = response.data;
+                const booksArray=[]
+                obj.forEach(element => {
+                   const book = element.doc;
+                   booksArray.push({
+                    bookId: book.isbn13,
+                    bookName: book.bookname,
+                    img: book.bookImageURL
+                   })
+                });
+                console.log("확인용")
+                console.log(booksArray)
+                setlibbookRank(booksArray)
+            } catch (error) {
+                console.log("도서관 추천 에러: " + error)
+            }
+        }
+        libbookData()
+    },[setlibbookRank])
 /*
     useEffect(() => {
         const url = ``//url필요
@@ -102,19 +146,20 @@ export default function(){
         navigation.navigate('bookDetailsPage', {id: id});
     }
 
-    const renderItem = ({item}: {item: bookRank}) => (
-        <TouchableOpacity onPress={() => bookBtn(item.bookId)}>
-          <View style = {styles.book}>
-                <View style = {{flex: 1}}>
-                    <Image source={{uri: item.img}} style = {{width: '100%', height: '100%'}}/>
-                </View>
-                <View style = {{alignItems: 'center', backgroundColor: 'white'}}>
-                    <Text>{item.bookName}</Text>
-                </View>
+    const renderItem = ({item}: {item: bookRank}) => {
+        return (
+          <TouchableOpacity onPress={() => bookBtn(item.bookId)}>
+            <View style={styles.book}>
+              <View style={{ flex: 1 }}>
+                <Image source={{ uri: item.img }} style={{ width: '100%', height: '100%' }} />
+              </View>
+              <View style={{ alignItems: 'center', backgroundColor: 'white' }}>
+                <Text numberOfLines={1} ellipsizeMode="tail">{item.bookName}</Text>
+              </View>
             </View>
-        </TouchableOpacity>
-  
-    );
+          </TouchableOpacity>
+        );
+      };
     
     const styles = StyleSheet.create({
         container: {
@@ -128,13 +173,13 @@ export default function(){
             marginTop: 20
         },
         ScrollView:{
-            height: 125,
+            height: 150,
             backgroundColor: '#D8D8D8'
         },
         book:{
             margin: 10,
-            width: 60,
-            height: 100,
+            width: 80,
+            height: 120,
             backgroundColor: '#D8D8D8'
         }
 
@@ -159,6 +204,8 @@ export default function(){
                 renderItem={renderItem}
                 keyExtractor={(item) => item.bookId}
                 style = {{flexDirection: 'row'}}
+                horizontal
+
             />
         </View>
         <Text style = {{marginTop: 30}}>이용 도서관 추천도서</Text>
@@ -168,6 +215,7 @@ export default function(){
                 renderItem={renderItem}
                 keyExtractor={(item) => item.bookId}
                 style = {{flexDirection: 'row'}}
+                horizontal
             />
         </View>
         <Text style = {{marginTop: 30}}>사용자 맞춤 추천 도서</Text>
@@ -177,6 +225,8 @@ export default function(){
                 renderItem={renderItem}
                 keyExtractor={(item) => item.bookId}
                 style = {{flexDirection: 'row'}}
+                horizontal
+
             />
         </View>
         

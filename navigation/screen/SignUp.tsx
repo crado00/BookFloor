@@ -9,6 +9,7 @@ import {
   View,
   ToastAndroid,
 } from 'react-native';
+import { RadioButton } from 'react-native-paper';
 
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { useNavigation } from '@react-navigation/native';
@@ -66,30 +67,11 @@ const SignUp = ({}) => {
   const [email, setEmail] = useState('');
   const [birthDate, setBirthDate] = useState('');
   const [loading, setLoading] = useState(false);
+  const [gender, setGender] = useState('');
 
   const idChange = (input) => {
     setDuplicate(false);
     setId(input);
-  };
-
-  const pwChange = (input) => {
-    setPw(input);
-  };
-
-  const pwCheckChange = (input) => {
-    setPwCheck(input);
-  };
-
-  const nameChange = (input) => {
-    setName(input);
-  };
-
-  const emailChange = (input) => {
-    setEmail(input);
-  };
-
-  const birthDateChange = (input) => {
-    setBirthDate(input);
   };
 
   const checkIdDuplicate = async () => {
@@ -139,6 +121,7 @@ const SignUp = ({}) => {
           name,
           email,
           birth_date: birthDate,
+          gender,
         }),
       });
       const responseJson = await response.json();
@@ -181,7 +164,7 @@ const SignUp = ({}) => {
             placeholder="비밀번호를 입력하세요."
             style={styles.Inputs}
             secureTextEntry
-            onChangeText={pwChange}
+            onChangeText={setPw}
             value={pw}
           />
         </View>
@@ -196,7 +179,7 @@ const SignUp = ({}) => {
             placeholder="비밀번호 확인"
             style={styles.Inputs}
             secureTextEntry
-            onChangeText={pwCheckChange}
+            onChangeText={setPwCheck}
             value={pwCheck}
           />
         </View>
@@ -210,7 +193,7 @@ const SignUp = ({}) => {
           <TextInput
             placeholder="이름을 입력하세요."
             style={styles.Inputs}
-            onChangeText={nameChange}
+            onChangeText={setName}
             value={name}
           />
         </View>
@@ -224,7 +207,7 @@ const SignUp = ({}) => {
           <TextInput
             placeholder="이메일주소를 입력하세요."
             style={styles.Inputs}
-            onChangeText={emailChange}
+            onChangeText={setEmail}
             value={email}
           />
         </View>
@@ -238,11 +221,32 @@ const SignUp = ({}) => {
           <TextInput
             placeholder="생년월일을 입력하세요."
             style={styles.Inputs}
-            onChangeText={birthDateChange}
+            onChangeText={setBirthDate}
             value={birthDate}
           />
         </View>
       </View>
+
+      <View style={styles.row}>
+        <View style={styles.textViews}>
+          <Text style={styles.texts}>성별</Text>
+        </View>
+        <View style={styles.textInputsContainer}>
+          <RadioButton
+            value="male"
+            status={gender === 'male' ? 'checked' : 'unchecked'}
+            onPress={() => setGender('male')}
+          />
+          <Text>남성</Text>
+          <RadioButton
+            value="female"
+            status={gender === 'female' ? 'checked' : 'unchecked'}
+            onPress={() => setGender('female')}
+          />
+          <Text>여성</Text>
+        </View>
+      </View>
+
       <View
         style={{
           flexDirection: 'row',

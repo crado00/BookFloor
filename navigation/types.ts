@@ -11,5 +11,7 @@ export declare module CommonType {
         profileMake: undefined;
         myStudy: undefined;
         libsel: undefined;
+        mapPage: undefined;
+        booklibsel: undefined;
     };
 }

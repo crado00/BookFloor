@@ -8,16 +8,15 @@ import MapPage from "./mapPage";
 export default function App() {
     const route = useRoute();
 
-    try {
-        console.log("data: "+route.params.data);
-    } catch (error) {
-        console.log ("data error: " + error);
-    }
-    console.log('확인')
-
+    useEffect(() => {
+        if (route.params?.update) {
+          console.log("Updated Data: ", route.params.update);
+          // updatedData를 사용하여 상태를 업데이트하거나 다른 작업을 수행합니다.
+        }
+      }, [route.params?.update]);
     return (
         <View style={{ flex: 1 }}>
-            <MapPage libraries={route.params?.data} />
+            <MapPage libraries={route.params?.data}/>
         </View>
     );
 }

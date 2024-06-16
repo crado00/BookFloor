@@ -27,12 +27,6 @@ function SignIn(): React.JSX.Element {
   const [id, setId] = useState<string>('');
   const [pw, setPw] = useState<string>('');
 
-  const idChange = (inputId: string) => {
-    setId(inputId);
-  };
-  const pwChange = (inputPw: string) => {
-    setPw(inputPw);
-  };
   const signUp = () => {
     navigation.navigate('SignUp');
   };
@@ -49,7 +43,8 @@ function SignIn(): React.JSX.Element {
       const responseJson = await response.json();
       if (response.ok) {
         await storeUserData(responseJson.token, id);
-        navigation.navigate('mainPage');
+        navigation.navigate('pageGruep');
+        
       } else {
         Alert.alert('로그인 실패', responseJson.message);
       }
@@ -60,6 +55,8 @@ function SignIn(): React.JSX.Element {
   };
 
   const kakaoSignIn = () => {
+    setId('')
+    setPw('')
     navigation.navigate('profileMake');
   };
 
@@ -121,10 +118,10 @@ function SignIn(): React.JSX.Element {
       <Text style={styles.titles}>책마루</Text>
       <View style={styles.row}>
         <View style={styles.textViews}>
-          <Text style={styles.texts}>이메일</Text>
+          <Text style={styles.texts}>아이디</Text>
         </View>
         <View style={styles.textInputsContainer}>
-          <TextInput placeholder="이메일을 입력하세요." onChangeText={idChange} style={styles.idInputs} value={id} ></TextInput>
+          <TextInput placeholder="아이디를 입력하세요." onChangeText={setId} style={styles.idInputs} value={id} ></TextInput>
         </View>
       </View>
 
@@ -133,7 +130,7 @@ function SignIn(): React.JSX.Element {
           <Text style={styles.texts}>비밀번호</Text>
         </View>
         <View style={styles.textInputsContainer}>
-          <TextInput placeholder="비밀번호를 입력하세요." onChangeText={pwChange} style={styles.pwInputs} value={pw}></TextInput>
+          <TextInput placeholder="비밀번호를 입력하세요." onChangeText={setPw} style={styles.pwInputs} value={pw}></TextInput>
         </View>
       </View>
 

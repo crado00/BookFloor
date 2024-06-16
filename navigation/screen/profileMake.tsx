@@ -1,9 +1,17 @@
 import React, { useState , useEffect } from 'react';
-import { View, StyleSheet, Button, Text , Image, TouchableOpacity, FlatList, Dimensions } from 'react-native';
+import { View, StyleSheet, Button, Text , Image, TouchableOpacity, FlatList, Dimensions, ToastAndroid } from 'react-native';
 import { ScrollView, TextInput } from 'react-native-gesture-handler';
 import { storeUserData, retrieveUserData } from './rogin/auth'
-import { useNavigation  } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { launchImageLibrary } from 'react-native-image-picker';
+import Geolocation from "react-native-geolocation-service"
+import {
+    request,
+    PERMISSIONS,
+    requestLocationAccuracy,
+    requestMultiple,
+  } from 'react-native-permissions';
+import axios from 'axios';
 
 interface btn {
     btnId: string,
@@ -30,9 +38,9 @@ const styles = StyleSheet.create({
     titleView: {},
     imgView: {
         margin: 10,
-        width: 100,
-        height: 100,
-        borderRadius: 50,
+        width: 150,
+        height: 150,
+        borderRadius: 75,
         overflow: 'hidden', // 이미지가 원 밖으로 벗어나지 않도록 설정합니다.
         borderWidth: 2,
         borderColor: 'black',
@@ -94,26 +102,96 @@ const styles = StyleSheet.create({
         marginRight: 10,
         marginLeft: 10,
         marginBottom: 10
-    }
+    },
+    selected: {
+        backgroundColor: '#cfc', // 선택된 항목의 배경색
+    },
 });
 
 
 
-const identification = () => {
-    //닉네임 중복확인
-}
-
 export default function() {
     const navigation = useNavigation();
-    
-    const [imageUri, setImageUri] = useState<string | null>(null);
+    const route = useRoute()
+    const [imageUri, setImageUri] = useState<string>('');
     const [searchdata, setSearchData] =useState<string>("");
+    const [libraryData, setLibraryData] = useState([])
+    const [chack, setChack] = useState('');//라이브러리 코드가 저장됨
+    useEffect(() =>{
+        requestMultiple([
+            PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
+            PERMISSIONS.ANDROID.ACCESS_BACKGROUND_LOCATION,
+          ])
+            .then((status) => {
+              console.log(`Location request status: ${status}`);
+            })
+            .catch((e) => {
+              console.error(`Location request has been failed: ${e}`);
+            });
+            
 
+            const location = () => Geolocation.getCurrentPosition(
+                (positon) =>{
+                  const {latitude, longitude } = positon.coords
+                    setlib(latitude, longitude);
+
+                },
+                (error) => {
+                  console.log(error)
+                },
+                {
+                  enableHighAccuracy: true,
+                  timeout: 20000,
+                  maximumAge: 0,
+                  distanceFilter: 1
+                }
+              )
+              location()
+
+              
+    },[])
+    useEffect(() => {
+        console.log("내용확인")
+  
+        if (route.params?.update) {
+          console.log(route.params.update+"확인")
+          setChack(route.params.update.libcode)
+        }
+      }, [route.params?.update]);
+    const setlib = async (lat: number, long: number) =>{
+    const url = `http://10.0.2.2:3001/library/libraries/${lat}/${long}/0.05/0.05`//연결 코드 추가
+        console.log(url)
+      try{
+      const response = await axios.get(url)
+      const obj = response.data
+        console.log(obj)
+      if(obj){
+          const newData = obj.map((item) => {
+            const setlat = Number(item.LATITUDE);
+            const setlong = Number(item.LONGITUDE);
+              return {
+                  libCode: item.LBRRY_CD,
+                  libName: item.LIBRARY_NAME,
+                  tel: item.LIBRARY_TEL,
+                  closed: item.LIBRARY_CLOSED,
+                  operatingTime: item.OPERATINGTIME,
+                  address: item.ADDRESS,
+                  latitude: setlat,
+                  longitude: setlong
+              }
+          })
+          setLibraryData(newData)
+          console.log(newData)
+      }
+      }catch(e){
+          console.log(e)
+      }
+    }
     const backbtn = () => {
         navigation.goBack();
     }
     
-    const imgChange = (setImageUri: React.Dispatch<React.SetStateAction<{ uri: string } | null>>) => {
+    const imgChange = () => {
         launchImageLibrary({
             mediaType: 'photo'
         }, (response) => {
@@ -123,58 +201,82 @@ export default function() {
             console.log('ImagePicker Error: ', response.errorMessage);
           } else if (response.assets && response.assets.length > 0) {
             const uri = response.assets[0].uri || ''; // undefined인 경우 빈 문자열로 대체
-            const source = { uri };
-            setImageUri(source);
+            setImageUri(uri);
           }
         });
       };
 
+      
     const complete = () => {
         // 저장 부분
         navigation.navigate('pageGruep');
     }
     const maplib = () => {
-        navigation.navigate('libsel', {data: libraryData});
+        navigation.navigate('mapPage', {data: libraryData});
     }
-    const search = () => {
+    const search = async () => {
         //도서관 이름 검색
-        
+        const url = `http://192.168.219.104:3001/library/search`
+        console.log(searchdata !== '')
+
+            if(searchdata !== ''){                
+                try{
+                  console.log('확인')
+                    const response = await axios.post(url,
+                        {
+                            name: searchdata,
+                            filters: {
+                                date: '2024-06-14'
+                            }
+                        }
+                    )
+                    const obj = response.data;
+                    console.log(obj)
+                    if(obj){
+                        const newData = obj.map((item) => {
+                            const setlat = Number(item.LATITUDE);
+                            const setlong = Number(item.LONGITUDE);
+                              return {
+                                  libCode: item.LBRRY_CD,
+                                  libName: item.LIBRARY_NAME,
+                                  tel: item.LIBRARY_TEL,
+                                  closed: item.LIBRARY_CLOSED,
+                                  operatingTime: item.OPERATINGTIME,
+                                  address: item.ADDRESS,
+                                  latitude: setlat,
+                                  longitude: setlong
+                              }
+                          })
+                          setLibraryData(newData)
+                    }
+                  }catch(e){
+
+                    console.log(e)
+                  }
+
+            }else{
+                ToastAndroid.show('도서관 이름을 입력해 주세요.', ToastAndroid.SHORT);
+            }
     }
-    const onSearch = (input) => {
-        setSearchData(input)
-    }
-    const libraryData = [
-        {
-            libCode: '1',
-            libName: '도서관',
-            tel: '010-2345-6789',
-            closed: '휴관일',
-            operatingTime: '운영시간',
-            address: '주소',
-            latitude: 37.498040483,
-            longitude: 127.02758183,
-        },
-        {
-            libCode: '2',
-            libName: '도서관',
-            tel: '010-2345-6789',
-            closed: '휴관일',
-            operatingTime: '운영시간',
-            address: '주소',
-            latitude: 33.38,
-            longitude: 126.55,
-        }
-    ];
+
     
-    const lib = ({ item }: { item: library }) => (
-        <TouchableOpacity>
-            <View style={styles.libList}>
+    const lib = ({ item }: { item: library }) => {
+
+        const chacklib = () =>{
+            setChack(item.libCode);
+        }
+
+        return(
+        <TouchableOpacity onPress={chacklib}>
+            <View style={[styles.libList, chack===item.libCode && styles.selected]}>
                 <Text>{item.libName}</Text>
-                <Text>{item.closed} {item.operatingTime}</Text>
-                <Text>{item.address}</Text>
+                <Text numberOfLines={1} ellipsizeMode="tail" >휴관일: {item.closed}</Text>
+                <Text numberOfLines={1} ellipsizeMode="tail" >운영시간: {item.operatingTime}</Text>
+                <Text>주소: {item.address}</Text>
             </View>
         </TouchableOpacity>
-    );
+        )
+    };
 
     return (
         <View style={{ flex: 1, backgroundColor: 'white', alignItems: 'center', justifyContent: 'center' }}>
@@ -190,17 +292,14 @@ export default function() {
                 </View>
             </TouchableOpacity>
             
-            <View style={styles.textInputView}>
-                <TextInput placeholder='닉네임을 입력하세요.' style={{ borderWidth: 2, borderColor: 'black', width: 200 }} />
-                <Button title='중복확인' onPress={identification} />
-            </View>
+            
             <View style={{ flex: 1, backgroundColor: '#E1FFFF', width: screenWidth, alignItems: 'center' }}>
                 
                 <View style={styles.libContainer}>
                     <Text style={{ fontSize: 30, color: 'white', margin: 10 }}>도서관 선택</Text>
                     
                     <View style ={styles.searchView}>
-                        <TextInput placeholder='도서관 이름을 입력하세요.' style={{ borderWidth: 2, borderColor: 'black', backgroundColor: 'white', flex: 1}} value={searchdata} onChangeText={onSearch}/>
+                        <TextInput placeholder='도서관 이름을 입력하세요.' style={{ borderWidth: 2, borderColor: 'black', backgroundColor: 'white', flex: 1}} value={searchdata} onChangeText={setSearchData}/>
                         <Button title='검색' onPress={search}/>
                     </View>
                     <FlatList
