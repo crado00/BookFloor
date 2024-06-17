@@ -25,7 +25,7 @@ const BookDataScreen = ({ route }) => {
               <Text style={styles.bookName}>책 이름: {book.bookname}</Text>
               <Text style={styles.bookDetail}>저자: {book.authors}</Text>
               <Text style={styles.bookDetail}>분류 번호: {book.class_no}</Text>
-              <Text style={styles.bookDetail}>책 코드: {book.book_code}</Text>
+              <Text style={styles.bookDetail}>청구기호: {book.book_code}</Text>
               <Text style={styles.bookDetail}>위치: {book.bookPosition}</Text>
             </View>
           ))}

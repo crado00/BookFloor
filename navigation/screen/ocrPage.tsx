@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Button, Text, Image, Dimensions, StyleSheet, TouchableOpacity, ScrollView, FlatList } from 'react-native';
+import { View, Button, Text, TextInput, Image, Dimensions, StyleSheet, TouchableOpacity, ScrollView, FlatList } from 'react-native';
 import { Camera, useCameraDevice, useCameraPermission } from 'react-native-vision-camera';
 import axios from 'axios';
 import RNFS from 'react-native-fs';
@@ -35,6 +35,8 @@ export default function App() {
   const [isbn13, setIsbn13] = useState<string | null>(null);
   const [bookData, setBookData] = useState<BookData2[]>([]);
   const [bookPosition, setBookPosition] = useState<string | null>(null);
+  const [a, setA] = useState('');
+  const [b, setB] = useState('');
 
   useEffect(() => {
     const requestCameraPermission = async () => {
@@ -298,11 +300,7 @@ export default function App() {
         <View style={styles.container}>
           <ScrollView contentContainerStyle={styles.scrollViewContent}>
             {renderSelectedWords()}
-            {isbn13 && (
-              <View style={styles.isbnContainer}>
-                <Text style={styles.isbnText}>ISBN13: {isbn13}</Text>
-              </View>
-            )}
+            
             {renderBookData()}
           </ScrollView>
           <View style={styles.buttonContainer}>
@@ -324,11 +322,27 @@ export default function App() {
           </View>
           <View style={styles.buttonContainer}>
             <Button title="사진 찍기" onPress={takePhoto} />
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter value for a"
+                keyboardType="numeric"
+                value={a}
+                onChangeText={setA}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Enter value for b"
+                keyboardType="numeric"
+                value={b}
+                onChangeText={setB}
+              />
+            </View>
             <Button
               title="test"
               onPress={async () => {
                 console.log('테스트 버튼 눌림');
-                await sendSelectedWordsToServer(833.6, 843);
+                await sendSelectedWordsToServer(parseFloat(a), parseFloat(b));
                 console.log('sendSelectedWordsToServer 완료');
                 navigateToBookResult();
               }}
@@ -422,5 +436,18 @@ const styles = StyleSheet.create({
   bookDetail: {
     fontSize: 14,
     color: 'gray',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '80%',
+  },
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 10,
+    paddingHorizontal: 10,
+    width: '48%', // Adjusted width to fit two inputs side by side
   },
 });
