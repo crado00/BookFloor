@@ -238,7 +238,7 @@ export default function App() {
     console.log(`모든 단어 선택됨: ${minNumber} ~ ${maxNumber}`);
     setLogMessages(logMessages => [...logMessages, `모든 단어 선택됨: ${minNumber} ~ ${maxNumber}`]);
     await sendSelectedWordsToServer(minNumber, maxNumber);
-    navigateToBookResult();
+    navigateToBookResult();                        
   };
 
   const renderSelectedWords = () => {
@@ -259,7 +259,7 @@ export default function App() {
   };
 
   const renderBookData = () => {
-    console.log('Rendering book data:', bookData);
+    console.log('책 정보 표시:', bookData);
     return (
       <View>
         {bookData.map((book, index) => (
@@ -306,7 +306,6 @@ export default function App() {
             {renderBookData()}
           </ScrollView>
           <View style={styles.buttonContainer}>
-            <Button title="결과 페이지로 이동" onPress={() => navigation.navigate('ocrBookResult', { bookData })} /> 
             <Button title="되돌리기" onPress={cancel} />
           </View>
         </View>
@@ -328,9 +327,9 @@ export default function App() {
             <Button
               title="test"
               onPress={async () => {
-                console.log('Test button pressed');
+                console.log('테스트 버튼 눌림');
                 await sendSelectedWordsToServer(833.6, 843);
-                console.log('sendSelectedWordsToServer completed');
+                console.log('sendSelectedWordsToServer 완료');
                 navigateToBookResult();
               }}
             />
