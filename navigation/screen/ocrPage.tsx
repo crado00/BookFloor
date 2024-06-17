@@ -46,6 +46,7 @@ export default function App() {
     requestCameraPermission();
   }, []);
 
+  //사진 촬영
   const takePhoto = async () => {
     if (!camera.current) return;
     try {
@@ -64,10 +65,13 @@ export default function App() {
     }
   };
 
+
+
   useEffect(() => {
     console.log('photoView state changed:', photoView);
   }, [photoView]);
 
+  //OCR
   const extractText = async (imageUri: string) => {
     console.log('Starting text extraction');
     setLogMessages(logMessages => [...logMessages, 'Starting text extraction']);
@@ -163,10 +167,11 @@ export default function App() {
     setBookData([]);
   };
 
+  //서버로 a,b전송
   const sendSelectedWordsToServer = async (a: number, b: number) => {
     console.log('Sending words to server:', { a, b });
     try {
-      const response = await axios.post('http://172.30.1.60:3000/saveSelectedWords', {
+      const response = await axios.post('http://221.168.128.40:3000/saveSelectedWords', {
         a,
         b,
       });
