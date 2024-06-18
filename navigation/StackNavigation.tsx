@@ -13,6 +13,8 @@ import profileMake from './screen/profileMake';
 import myStudy from './screen/myStudy';
 import libsel from './screen/libsel';
 import ocrBookResult from './screen/ocrBookResult';
+import bookListScreen from './screen/bookListScreen';
+import ocrPage2 from './screen/ocrPage2';
 
 const StackNavigation = () => {// 스택 내비게이션을 설정하는 컴포넌트
     
@@ -48,6 +50,8 @@ const StackNavigation = () => {// 스택 내비게이션을 설정하는 컴포�
                 <Stack.Screen name='myStudy' component={myStudy} />
                 <Stack.Screen name='libsel' component={libsel} />
                 <Stack.Screen name='ocrBookResult' component={ocrBookResult} />
+                <Stack.Screen name="bookListScreen" component={bookListScreen} />
+                <Stack.Screen name="ocrPage2" component={ocrPage2} />
             </Stack.Navigator>
         </NavigationContainer >
     )
