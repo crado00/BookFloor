@@ -8,7 +8,8 @@ import User from './models/user';
 import authRoutes from './auth';
 import library from './library';
 import path from 'path';
-
+import ai from './ai';
+import ocr from'./ocr';
 const app = express();
 const PORT = 3001;
 
@@ -17,8 +18,10 @@ app.use(bodyParser.json());
 
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
+app.use('/ai', ai);
 app.use('/api', authRoutes);
 app.use('/library', library);
+app.use('/ocr', ocr);
 
 sequelize.sync()
   .then(() => {

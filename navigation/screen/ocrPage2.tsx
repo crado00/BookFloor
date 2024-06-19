@@ -1,66 +1,52 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Button, Text, TextInput, Image, Dimensions, StyleSheet, TouchableOpacity, ScrollView, FlatList } from 'react-native';
+import { View, Button, Text, TextInput, Image, Modal, Dimensions, StyleSheet, TouchableOpacity, ScrollView, FlatList } from 'react-native';
 import { Camera, useCameraDevice, useCameraPermission } from 'react-native-vision-camera';
 import axios from 'axios';
 import RNFS from 'react-native-fs';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { CommonType } from './navigation/types';
 
-type OcrPageNavigationProp = StackNavigationProp<CommonType.RootStackPageList, 'ocrPage'>;
+
+type OcrPage2NavigationProp = StackNavigationProp<CommonType.RootStackPageList, 'ocrPage2'>;
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('screen');
 
-interface BookData {
-  bookname: string;
-  authors: string;
-  class_no: string;
-  book_code: string;
-}
 
-interface BookData2 extends BookData {
-  bookPosition: string;
-}
-
-interface Book {
-  bookname: string;
-  authors: string;
-  publisher: string;
-  publication_year: string;
-  isbn13: string;
-  vol?: string;
-  bookImageURL?: string;
-  bookDtlUrl: string;
-  loan_count: string;
-}
-
-export default function App() {
-  const navigation = useNavigation<OcrPageNavigationProp>();
+const ocrPage2 = ({ route })=> {
+  const navigation = useNavigation<OcrPage2NavigationProp>();
   const { hasPermission, requestPermission } = useCameraPermission();
   const [photoView, setPhotoView] = useState(false);
   const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
   const [ocrText, setOcrText] = useState('');
   const device = useCameraDevice('back');
   const camera = useRef<Camera>(null);
+  const [isbn13, setIsbn13] = useState<string | null>(null);
+  const [classCode, setClassCode] = useState<string | null>(null);
   const [selectedWords, setSelectedWords] = useState<string[][]>([]);
   const [logMessages, setLogMessages] = useState<string[]>([]);
-  const [isbn13, setIsbn13] = useState<string | null>(null);
-  const [bookData, setBookData] = useState<BookData2[]>([]);
   const [bookPosition, setBookPosition] = useState<string | null>(null);
   const [a, setA] = useState('');
   const [b, setB] = useState('');
-  const [bookTitle, setBookTitle] = useState('');
-  const [bookList, setBookList] = useState<Book[]>([]);
-  const [selectedIsbn13, setSelectedIsbn13] = useState<string | null>(null);
+  const [classNo, setClassNo] = useState<number | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [classNoPosition, setClassNoPosition] = useState<string | null>(null);
+
 
   useEffect(() => {
+    const { classNo, classCode, isbn13 } = route.params;
+    console.log('Route params:', route.params);
+    setClassNo(classNo);
+    setClassCode(classCode);
+    setIsbn13(isbn13);
     const requestCameraPermission = async () => {
       await requestPermission();
     };
 
     requestCameraPermission();
-  }, []);
+  }, [route.params]);
 
+  
   //사진 촬영
   const takePhoto = async () => {
     if (!camera.current) return;
@@ -178,96 +164,32 @@ export default function App() {
   const cancel = () => {
     setPhotoView(false);
     setLogMessages([]);
-    setBookData([]);
   };
 
-  //서버로 a,b전송
-  const sendSelectedWordsToServer = async (a: number, b: number) => {
-    console.log('Sending words to server:', { a, b });
+    //서버로 a,b, isbn13 전송
+  const sendSelectedWordsToServer = async (a: number, b: number, isbn13: string) => {
+    if (!isbn13) {
+      console.error('ISBN13 is missing');
+      return;
+    }
+    console.log('Sending words to server:', { a, b , isbn13});
     try {
-      const response = await axios.post('http://172.16.38.97:3000/saveSelectedWords', {
+      const response = await axios.post('http://172.16.38.97:3000/savetitleSearch', {
         a,
         b,
+        isbn13,
       });
       console.log('Data sent to server:', response.data);
-      setLogMessages(logMessages => [...logMessages, `Data sent to server: ${response.data}`]);
-      if (response.data.isbn13 != null) {
-        setIsbn13(response.data.isbn13); 
+      if (response.data.class_no_position) {
+        setClassNoPosition(response.data.class_no_position);
+        setModalVisible(true);
       }
-      if (response.data.bookPosition != null) {
-        setBookPosition(response.data.bookPosition); 
-      }
-      const bookDetails = await fetchBookData(response.data.isbn13, response.data.bookPosition);
-      navigateToBookResult(bookDetails);
     } catch (error) {
       console.error('Error sending data to server:', error);
       setLogMessages(logMessages => [...logMessages, `Error sending data to server: ${error.message}`]);
     }
   };
 
-  //책 제목으로 탐색
-  const positionSearch = async () => {
-    if (!bookTitle) {
-      console.error('책 제목 에러');
-      setLogMessages(logMessages => [...logMessages, 'Book Title Error']);
-      return;
-    }
-  
-    const url = `http://data4library.kr/api/srchBooks?authKey=3893e049e54f909aaaf758d6feda80d62f0619816c3d4ab05a76826ae6dbb046&title=${bookTitle}&format=json&pageNo=1&pageSize=10 `;
-    try {
-      const response = await axios.get(url);
-      const obj = response.data;
-      console.log('API Response:', JSON.stringify(obj, null, 2));
-      setLogMessages(logMessages => [...logMessages, `API Response: ${JSON.stringify(obj, null, 2)}`]);
-      
-      const books: Book[] = obj.response?.docs?.map((doc: any) => doc.doc) || [];
-      console.log('Books:', books);
-      setBookList(books);
-      console.log('BookList State Updated:', books);
-      navigation.navigate('bookListScreen', { bookList: books});
-    } catch (error) {
-      console.error('API Request Error:', error);
-      setLogMessages(logMessages => [...logMessages, 'API Request Error']);
-    }
-  };
-
-  //정보나루 API 호출
-  const fetchBookData = async (isbn: string, bookPosition: string) => {
-    const url = `http://data4library.kr/api/itemSrch?authKey=3893e049e54f909aaaf758d6feda80d62f0619816c3d4ab05a76826ae6dbb046&libCode=141263&isbn13=${isbn}&type=ALL&format=json`;
-    try {
-      const response = await axios.get(url);
-      const obj = response.data;
-      console.log('API Response:', JSON.stringify(obj, null, 2));
-
-      const booksArray: BookData2[] = [];
-      if (obj.response?.docs) {
-        obj.response.docs.forEach((item: any) => {
-          const book = item.doc;
-          const bookCode = book.callNumbers.length > 0 ? book.callNumbers[0].callNumber.book_code : 'N/A';
-          console.log(`전달값: bookname=${book.bookname}, authors=${book.authors}, class_no=${book.class_no}, book_code=${bookCode}, bookPosition=${bookPosition}`);
-          booksArray.push({
-            bookname: book.bookname,
-            authors: book.authors,
-            class_no: book.class_no,
-            book_code: bookCode,
-            bookPosition: bookPosition,
-          });
-        });
-      }
-      return booksArray;
-    } catch (error) {
-      console.error(`Error: ${error}`);
-      setLogMessages(logMessages => [...logMessages, `Error: ${error.message}`]);
-      return [];
-    }
-  };
-
-  //책 정보 결과로
-  const navigateToBookResult = (bookData: BookData2[]) => {
-    if (bookData.length > 0) {
-      navigation.navigate('ocrBookResult', { bookData });
-    }
-  };
 
   //범위 선택
   const handleSelectedWordPress = async (words: string[]) => {
@@ -276,22 +198,15 @@ export default function App() {
     if (words.length >= 2) {
       const a = extractNumber(words[0]);
       const b = extractNumber(words[1]);
-      await sendSelectedWordsToServer(a, b);
+      if (isbn13) {
+        await sendSelectedWordsToServer(a, b, isbn13);
+      } else {
+        console.error('ISBN13 is missing');
+      }
     }
-    navigateToBookResult();
   };
 
-  //범위 전체 선택
-  const handleSelectAllPress = async () => {
-    const allNumbers = selectedWords.flatMap(pair => pair.map(word => extractNumber(word)));
-    const minNumber = Math.min(...allNumbers);
-    const maxNumber = Math.max(...allNumbers);
-    console.log(`모든 단어 선택됨: ${minNumber} ~ ${maxNumber}`);
-    setLogMessages(logMessages => [...logMessages, `모든 단어 선택됨: ${minNumber} ~ ${maxNumber}`]);
-    await sendSelectedWordsToServer(minNumber, maxNumber);
-    navigateToBookResult();                        
-  };
-
+ 
   //범위 생성
   const renderSelectedWords = () => {
     return (
@@ -301,34 +216,11 @@ export default function App() {
             <Text style={styles.itemButton}>{pair.join(' ~ ')}</Text>
           </TouchableOpacity>
         ))}
-        <View style={styles.buttonRow}>
-          <TouchableOpacity onPress={handleSelectAllPress}>
-            <Text style={[styles.itemButton, styles.selectAllButton]}>전체 선택</Text>
-          </TouchableOpacity>
-        </View>
       </View>
     );
   };
 
-  //책 정보
-  const renderBookData = () => {
-    console.log('책 정보 표시:', bookData);
-    return (
-      <View>
-        {bookData.map((book, index) => (
-          <View key={index} style={styles.bookItem}>
-            <Text style={styles.bookName}>책 이름: {book.bookname}</Text>
-            <Text style={styles.bookDetail}>저자: {book.authors}</Text>
-            <Text style={styles.bookDetail}>분류 번호: {book.class_no}</Text>
-            <Text style={styles.bookDetail}>책 코드: {book.book_code}</Text>
-            <Text style={styles.bookDetail}>위치: {book.bookPosition}</Text>
-          </View>
-        ))}
-      </View>
-    );
-  };
-
-
+  
   if (hasPermission === null) {
     return (
       <View style={styles.container}>
@@ -351,8 +243,6 @@ export default function App() {
         <View style={styles.container}>
           <ScrollView contentContainerStyle={styles.scrollViewContent}>
             {renderSelectedWords()}
-            {renderBookData()}
-            
           </ScrollView>
           <View style={styles.buttonContainer}>
             <Button title="되돌리기" onPress={cancel} />
@@ -373,44 +263,27 @@ export default function App() {
           </View>
           <View style={styles.buttonContainer}>
             <Button title="사진 찍기" onPress={takePhoto} />
-            <View style={styles.inputAndButtonContainer}>
-              <TextInput
-                style={styles.input}
-                placeholder="a"
-                keyboardType="numeric"
-                value={a}
-                onChangeText={setA}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="b"
-                keyboardType="numeric"
-                value={b}
-                onChangeText={setB}
-              />
-              <Button
-                title="수동 입력"
-                onPress={async () => {
-                  console.log('수동 눌림');
-                  await sendSelectedWordsToServer(parseFloat(a), parseFloat(b));
-                  console.log('sendSelectedWordsToServer 완료');
-                  navigateToBookResult();
-                }}
-              />
-            </View>
-            <View style={styles.titleContainer}>
-              <TextInput
-                style={styles.input}
-                placeholder="title"
-                value={bookTitle}
-                onChangeText={setBookTitle}
-              />
-              <Button title="제목으로 위치 찾기" onPress={positionSearch} />
-            </View>
           </View>
         </View>
       )}
-      
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>책 위치: {classNoPosition}</Text>
+            <Button
+              title="확인"
+              onPress={() => setModalVisible(!modalVisible)}
+            />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -523,5 +396,40 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '80%',
     marginTop: 20,
-  }
+  },
+  screen: {
+    flex: 1,
+    backgroundColor: '#ffffff'
+  },
+  text: {
+    fontSize: 20
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+    fontSize: 18,
+  },
 });
+
+export default ocrPage2;

@@ -167,7 +167,7 @@ const setlib = () => {
 }
 
   const handleSearch = async () => {
-    const url = `http://10.0.2.2:3000/search`
+    const url = `http://172.16.38.97:3000/search`
         console.log(search !== '')
 
             if(search !== ''){                

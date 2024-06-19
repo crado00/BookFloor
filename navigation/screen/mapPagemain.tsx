@@ -128,6 +128,7 @@ export default function mapPage() {
     }
   }, []);
   useEffect(() => {
+    console.log('확인')
     const location = () => Geolocation.getCurrentPosition(
       (positon) =>{
         const {latitude, longitude} = positon.coords
@@ -149,7 +150,7 @@ export default function mapPage() {
   }, [setCurrentLocation])
 
   const setlib = async (lat: number, long: number) =>{
-    const url = `http://10.0.2.2:3000/library/libraries/${lat}/${long}/0.05/0.05`//연결 코드 추가
+    const url = `http://172.16.38.97:3001/library/libraries/${lat}/${long}/0.05/0.05`//연결 코드 추가
   
         console.log('전송시작')
       try{
@@ -187,7 +188,7 @@ export default function mapPage() {
 };
 
   const handleSearch = async () => {
-    const url = `http://10.0.2.2:3001/library/search`
+    const url = `http://172.16.38.97:3001/library/search`
 
             if(search !== ''){                
                 try{

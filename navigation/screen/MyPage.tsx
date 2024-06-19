@@ -14,7 +14,7 @@ const MyPage = () =>{
   useEffect(() => {
     const fetchData = async () => {
       const data = await retrieveUserData();
-      setImgUrl(`http://10.0.2.2:3001/uploads/${data.profileImage}`)
+      setImgUrl(`http://172.16.38.97:3001/uploads/${data.profileImage}`)
       setName(data.username);
     };
 
@@ -32,7 +32,7 @@ const MyPage = () =>{
 
   const handleLogout = async () => {
     try {
-      await axios.post('http://10.0.2.2:3001/api/logout');
+      await axios.post('http://172.16.38.97:3001/api/logout');
       navigation.navigate('SignIn');
     } catch (error) {
       console.error('Logout failed', error);
@@ -41,7 +41,7 @@ const MyPage = () =>{
 
   const handleDeleteAccount = async () => {
     try {
-      await axios.post('http://10.0.2.2:3001/api/delete-account', {
+      await axios.post('http://172.16.38.97:3001/api/delete-account', {
         username: Name,
       });
       navigation.navigate('SignIn');
@@ -63,18 +63,22 @@ const MyPage = () =>{
           <View>
             <Text style = {styles.userName}>{Name}</Text>
           </View>
-          <View style = {styles.profile3}>
-              <Button title='프로필 변경'onPress={pfcp}/>
-          </View>
+          
         </View>
         
       </View>
       
       <View style = {{height: 10 ,backgroundColor: 'white_gray'}}/>
-      <MyStudy/>
       <View style={styles.buttonContainer}>
-        <Button title="로그아웃" onPress={handleLogout} />
-        <Button title="회원탈퇴" onPress={handleDeleteAccount} />
+        <View style = {styles.btncon}>
+          <Button title='프로필 변경'onPress={pfcp} />
+        </View>
+        <View style = {styles.btncon}>
+          <Button title="로그아웃" onPress={handleLogout} />
+        </View>
+        <View style = {styles.btncon}>
+          <Button title="회원탈퇴" onPress={handleDeleteAccount} />
+        </View>
       </View>
     </View>
     );
@@ -147,10 +151,14 @@ const styles = StyleSheet.create({
       marginRight: 20
     },
     buttonContainer: {
-      flexDirection: 'row',
-      justifyContent: 'space-around',
+      flexDirection: 'column',
       marginTop: 20,
+      flex: 1,
+      backgroundColor: '#D8D8D8',
     },
+    btncon: {
+      margin: 20
+    }
     
   });
 

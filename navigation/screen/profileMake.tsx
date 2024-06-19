@@ -156,11 +156,11 @@ export default function() {
         if (route.params?.libcode) {
           setChack(route.params.libcode)
         }
-      }, [route.params?.libcode]);
+    }, [route.params?.libcode]);
 
       
     const setlib = async (lat: number, long: number) =>{
-    const url = `http://10.0.2.2:3001/library/libraries/${lat}/${long}/0.05/0.05`//연결 코드 추가
+    const url = `http://172.16.38.97:3001/library/libraries/${lat}/${long}/0.05/0.05`//연결 코드 추가
 
       try{
       const response = await axios.get(url)
@@ -181,14 +181,13 @@ export default function() {
               }
           })
           setLibraryData(newData)
-          navigation.navigate('SignIn');
       }
       }catch(e){
           console.log(e)
       }
     }
     const backbtn = () => {
-        navigation.goBack()
+        navigation.navigate('SignIn');
     }
     
     const imgChange = () => {
@@ -208,7 +207,7 @@ export default function() {
 
       
     const complete = async () => {
-        const url = `http://10.0.2.2:3001/api/update-profile`
+        const url = `http://172.16.38.97:3001/api/update-profile`
         const formData = new FormData();
         formData.append('profileImage', {
           uri: imageUri,
@@ -235,7 +234,7 @@ export default function() {
     }
     const search = async () => {
         //도서관 이름 검색
-        const url = `http://192.168.219.104:3001/library/search`
+        const url = `http://172.16.38.97:3001/library/search`
         console.log(searchdata !== '')
 
             if(searchdata !== ''){                

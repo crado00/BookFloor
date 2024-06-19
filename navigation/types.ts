@@ -13,5 +13,8 @@ export declare module CommonType {
         libsel: undefined;
         mapPage: undefined;
         booklibsel: undefined;
+        ocrBookResult: undefined;
+        bookListScreen: { bookList: any[], a: string, b: string, isbn13: string };
+        ocrPage2: { classNo: string, classCode: string, isbn13: string };
     };
 }

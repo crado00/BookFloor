@@ -16,7 +16,7 @@ import { useNavigation } from '@react-navigation/native';
 
 const SignUp = ({}) => {
   const isDarkMode = useColorScheme() === 'dark';
-  const serverAddress = 'http://10.0.2.2:3001/api';
+  const serverAddress = 'http://172.16.38.97:3001/api';
 
   const backgroundStyle = {
     flex: 1,

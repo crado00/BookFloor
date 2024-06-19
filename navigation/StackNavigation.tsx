@@ -14,7 +14,9 @@ import myStudy from './screen/myStudy';
 import libsel from './screen/libsel'
 import mapPage from './screen/mapPage';
 import booklibsel from './screen/booklibsel';
-
+import ocrBookResult from './screen/ocrBookResult';
+import ocrPage2 from './screen/ocrPage2';
+import bookListScreen from './screen/bookListScreen';
 const StackNavigation = () => {// 스택 내비게이션을 설정하는 컴포넌트
     
     
@@ -50,6 +52,8 @@ const StackNavigation = () => {// 스택 내비게이션을 설정하는 컴포�
                 <Stack.Screen name='libsel' component={libsel} />
                 <Stack.Screen name='booklibsel' component={booklibsel}/>
                 <Stack.Screen name='mapPage' component={mapPage}/>
+                <Stack.Screen name='ocrBookResult' component={ocrBookResult} />
+                <Stack.Screen name="ocrPage2" component={ocrPage2} />
             </Stack.Navigator>
         </NavigationContainer >
     )

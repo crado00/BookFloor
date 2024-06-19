@@ -4,7 +4,7 @@ import { ScrollView, TextInput } from 'react-native-gesture-handler';
 import { storeUserData, retrieveUserData } from './rogin/auth'
 import { useNavigation  } from '@react-navigation/native';
 import axios from 'axios';
-
+import BookRecommendation from './ai';
 
 const userData = retrieveUserData();
 
@@ -20,25 +20,66 @@ export default function(){
     const [searchWord, setSearchWord] = useState<string>('');
     const [libbookRank, setlibbookRank] =useState([]);
     const [bookRank, setbookRank] =useState([]);
+    const [bookSuggestion, setbookSuggestion] =useState([]);
     const navigation = useNavigation();
     const key = 'faf460c70f6b5b9163c4fb0b97d3cfc5ea649d7319099d1c7568b8d076a2131f'
-    var bookSuggestion;
+    
+    useEffect(() => {
+        bookSuggestiondata()
+            console.log('확인')
+            console.log(bookSuggestion)
+    },[])
+    
+    const bookSuggestiondata = async () =>{
+        try {
+            console.log('확인')
+            const data = await retrieveUserData();
+      
+              const response = await axios.get(`http://172.16.38.97:3001/ai/recommendBooks/${data.userId}`)
+              
+              const dataset: ((prevState: never[]) => never[]) | { bookId: any; bookName: any; img: any; }[] =[]
+              const obj = response.data;
+            console.log(obj)
+            if (obj.response && obj.response.predicted_isbns){
+                obj.response.predicted_isbns.forEach(async (item) =>{
+                    const isbn13 = item.substring(1, item.length - 1);
+            const url = `http://data4library.kr/api/srchBooks?authKey=${key}&isbn13=${isbn13}&pageNo=1&pageSize=10&format=json`;
+            console.log(url)
+            const responseset = await axios.get(url)
+                  const obj = responseset.data;
+            console.log('확인2')
+            if (obj.response && obj.response.docs) {
+            console.log(obj.response.docs)
+            obj.response.docs.forEach((item) => {
+            console.log('확인3')
+            const book = item.doc;
+                  console.log ('book')
+                  console.log (book)
+                  console.log ('book')
+                  dataset.push({
+                    bookId: book.isbn13,
+                    bookName: book.bookname,
+                    img: book.bookImageURL
+                  })
+                })
+      
+              }
+                  
+                })
+              }
+            setbookSuggestion(dataset)
+              
+            } catch (error) {
+              console.error(error);
+            }
+    }
 
-    
-    bookSuggestion = [
-        {
-            bookId: 'b1',
-            bookName: '확인용',
-            img: 'https://gongu.copyright.or.kr/gongu/wrt/cmmn/wrtFileImageView.do?wrtSn=9046601&filePath=L2Rpc2sxL25ld2RhdGEvMjAxNC8yMS9DTFM2L2FzYWRhbFBob3RvXzI0MTRfMjAxNDA0MTY=&thumbAt=Y&thumbSe=b_tbumb&wrtTy=10004',
-        },
-    ]
-    
+
     
     const searchWordChange = (input: string) => {
         setSearchWord(input);
     }
     useEffect(() =>{
-        const currentDate = new Date();
         const oneWeekAgo = new Date();
         oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
         const year = oneWeekAgo.getFullYear()
@@ -70,10 +111,10 @@ export default function(){
             }
         }
         libbookData()
-    },[])
+    },[setbookRank])
 
     useEffect(() =>{
-        const url = `http://10.0.2.2:3001/library/popular-book/144177`
+        const url = `http://172.16.38.97:3001/library/popular-book/144177`
         const libbookData = async () => {
             try {
                 const response = await axios.get(url)

@@ -6,7 +6,7 @@ import axios from "axios";
 async function searchCode(keyword: string){
     const authKey = '3893e049e54f909aaaf758d6feda80d62f0619816c3d4ab05a76826ae6dbb046'
     const url = `http://data4library.kr/api/srchBooks?authKey=${authKey}&title=${keyword}&pageNo=1&pageSize=10&format=json`;
-    console.log('===확인===\n');
+    console.log('===확인===');
     console.log(url)
     
     try {

@@ -93,7 +93,7 @@ export default function() {
     }
 
     const setlib = async (lat: number, long: number) =>{
-        const url = `http://10.0.2.2:3001/library/find/`//연결 코드 추가
+        const url = `http://172.16.38.97:3001/library/find/`//연결 코드 추가
     
             console.log('전송시작')
           try{

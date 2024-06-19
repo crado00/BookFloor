@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Button,
   SafeAreaView,
@@ -10,6 +10,7 @@ import {
   View,
   Alert,
   ToastAndroid,
+  LogBox 
 } from 'react-native';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { useNavigation } from '@react-navigation/native';
@@ -22,7 +23,7 @@ function SignIn(): React.JSX.Element {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
   const navigation = useNavigation();
-  const serverAddress = 'http://10.0.2.2:3001/api';
+  const serverAddress = 'http://172.16.38.97:3001/api';
 
   const [id, setId] = useState<string>('');
   const [pw, setPw] = useState<string>('');
@@ -31,7 +32,14 @@ function SignIn(): React.JSX.Element {
     navigation.navigate('SignUp');
   };
 
+  useEffect(()=>{
+    //LogBox.ignoreAllLogs();
+    LogBox.install();
+    console.log('작동확인')
+  })
   const signIn = async () => {
+    console.log('작동확인')
+
     try {
       const response = await fetch(`${serverAddress}/login`, {
         method: 'POST',
@@ -60,7 +68,7 @@ function SignIn(): React.JSX.Element {
   const kakaoSignIn = () => {
     setId('')
     setPw('')
-    navigation.navigate('profileMake');
+    //navigation.navigate('ai');
   };
 
   const styles = StyleSheet.create({
@@ -142,9 +150,9 @@ function SignIn(): React.JSX.Element {
           <Button title='로그인' onPress={signIn}></Button>
         </View>
 
-        <View style={styles.buttenView}>
+        {/*<View style={styles.buttenView}>
           <Button title='카카오톡 로그인' onPress={kakaoSignIn}></Button>
-        </View>
+        </View>*/}
 
         <View style={styles.linkView}>
           <TouchableOpacity onPress={signUp}>

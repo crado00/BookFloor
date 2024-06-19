@@ -158,7 +158,7 @@ export default function mapPage({ libraries }: MapPageProps) {
 };
 
   const handleSearch = async () => {
-    const url = `http://10.0.2.2:3001/api/libname?libname=${search}`
+    const url = `http://172.16.38.97:3001/api/libname?libname=${search}`
     try{
       const response = await axios.post(url);
       console.log(response)

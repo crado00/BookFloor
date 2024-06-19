@@ -76,7 +76,7 @@ export default function profileChange(){
               location()
               
               const setlib = async (lat: number, long: number) =>{
-                const url = `http://10.0.2.2:3001/library/libraries/${lat}/${long}/0.05/0.05`//연결 코드 추가
+                const url = `http://172.16.38.97:3001/library/libraries/${lat}/${long}/0.05/0.05`//연결 코드 추가
             
                     console.log('전송시작')
                   try{
@@ -115,7 +115,7 @@ export default function profileChange(){
     }, [route.params?.libcode]);
 
     const btn = async () => {
-        const url = `http://10.0.2.2:3001/api/update-profile`
+        const url = `http://172.16.38.97:3001/api/update-profile`
         const formData = new FormData();
         formData.append('profileImage', {
           uri: imageUri,
@@ -141,7 +141,7 @@ export default function profileChange(){
     }
 
     const libsearch = async () => {
-      const url = `http://10.0.2.2:3001/library/search`
+      const url = `http://172.16.38.97:3001/library/search`
         console.log(searchlib !== '')
 
             if(searchlib !== ''){                
